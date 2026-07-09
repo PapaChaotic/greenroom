@@ -32,6 +32,7 @@ app stays tucked away in the tray:
 ## Features
 
 - 🎙 **Party voice chat** — mic permission is pre-scoped to xbox.com; voice just works
+- 🎮 **Cloud gaming works too** — Xbox Cloud Gaming streams over WebRTC (no DRM plugin needed), so Game Pass titles play right in the app, controller and all
 - ⌨️ **Customizable hotkeys** — mic toggle (push-to-talk style) and Game Bar HUD, rebindable in Settings
 - 🪟 **Game Bar HUD** — hotkey summons a small translucent pill of party essentials (mic toggle, party-audio light) over your game; Esc or clicking away dismisses it while the party keeps running
 - 🔕 **System tray** — closing the window keeps your party running; mute from the tray
@@ -85,8 +86,9 @@ GreenRoom.AppImage --mic   # toggle your microphone
 - An Xbox/Microsoft account. Party chat on the web rolled out via the Xbox
   Insider program; if the party UI doesn't appear for your account, enroll at
   [xbox.com insider program](https://www.xbox.com/en-US/xbox-insider-program).
-- **Voice chat only** — cloud gaming video needs Widevine DRM which this build
-  intentionally omits (chat-first scope).
+- **Cloud gaming plays** because Xbox streams gameplay over WebRTC (no DRM
+  plugin required). Note the app is chat-first: streaming performance
+  tuning (codec/VRR/latency work) isn't a current focus.
 - Mic capture uses your system's PipeWire/PulseAudio; if the mic works in
   Chromium, it works here.
 - **Beta**: expect rough edges — crashes offer a pre-filled GitHub issue

@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+- The HUD party-audio light now ignores cloud-gaming streams (connections
+  carrying video) — it responds to party voices, not game sound.
+
+### Corrected
+- **Cloud gaming actually works** and the docs now say so. Earlier releases
+  claimed gameplay needed Widevine DRM; Xbox Cloud Gaming streams over
+  WebRTC, which this app supports natively. Game Pass titles play in the
+  app, controller included.
+
 ## 0.9.0 (2026-07-09)
 
 First release. GreenRoom is an **unofficial Xbox party chat client for

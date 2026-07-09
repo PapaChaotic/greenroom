@@ -39,8 +39,19 @@ const INJECT = String.raw`(() => {
   if (RTC) {
     window.RTCPeerConnection = function (...args) {
       const pc = new RTC(...args);
+      // Party chat connections are audio-only. Cloud-gaming streams carry
+      // video on the same connection — their audio is GAME sound, not
+      // voices, so it must not drive the party-activity light.
+      const stops = new Set();
+      let isGameStream = false;
       pc.addEventListener('track', (ev) => {
-        if (ev.track.kind !== 'audio') return;
+        if (ev.track.kind === 'video') {
+          isGameStream = true;
+          for (const stop of stops) stop();
+          stops.clear();
+          return;
+        }
+        if (ev.track.kind !== 'audio' || isGameStream) return;
         try {
           const ctx = window.__grCtx || (window.__grCtx = new AudioContext());
           if (ctx.state === 'suspended') ctx.resume().catch(() => {});
@@ -58,6 +69,7 @@ const INJECT = String.raw`(() => {
             }
             state.remote = Math.max(state.remote, peak / 128);
           }, 150);
+          stops.add(() => clearInterval(timer));
         } catch {}
       });
       return pc;
