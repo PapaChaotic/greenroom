@@ -95,6 +95,9 @@ function createHud() {
 
 function showHud() {
   if (!hud || hud.isDestroyed()) createHud();
+  // Game Bar semantics: the HUD replaces the app — the full window goes to
+  // the tray so only the pill floats over your game.
+  if (main && !main.isDestroyed() && main.isVisible()) main.hide();
   const { workArea } = screen.getDisplayNearestPoint(
     screen.getCursorScreenPoint()
   );

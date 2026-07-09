@@ -12,11 +12,22 @@ const crash = require('./src/crash');
 const pkg = require('./package.json');
 const REPO_URL = pkg.homepage;
 
-// Tray apps must be single-instance: a second launch focuses the first.
+// On Wayland, global hotkeys must go through the desktop's GlobalShortcuts
+// portal (KDE ships it; GNOME 48+). This makes Chromium use it when present.
+app.commandLine.appendSwitch('enable-features', 'GlobalShortcutsPortal');
+
+// Tray apps must be single-instance: a second launch signals the first.
+// That also gives us a hotkey fallback that works on EVERY desktop: bind a
+// system shortcut to `greenroom --hud` (or --mic) and it controls the
+// running instance.
 if (!app.requestSingleInstanceLock()) {
   app.quit();
 } else {
-  app.on('second-instance', () => windows.show());
+  app.on('second-instance', (_e, argv) => {
+    if (argv.includes('--hud')) actions.gameBar();
+    else if (argv.includes('--mic')) actions.toggleMic();
+    else windows.show();
+  });
 }
 
 let quitting = false;

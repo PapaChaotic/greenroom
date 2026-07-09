@@ -41,10 +41,28 @@ Full instructions, including **Steam Deck setup**, in [docs/INSTALL.md](docs/INS
 
 | Action | Default | Notes |
 |---|---|---|
-| Mic toggle | `Ctrl+Shift+M` | Works globally on X11/Deck; focus-only on Wayland desktops without the GlobalShortcuts portal |
-| Game Bar HUD | `Ctrl+Shift+G` | Summons the translucent party pill; Esc or click-away dismisses |
+| Mic toggle | `Ctrl+Shift+M` | See hotkey notes below |
+| Game Bar HUD | `Ctrl+Shift+G` | Summons the translucent party pill (main window goes to the tray); Esc or click-away dismisses |
 
 Rebind both in **Settings** (gear icon or tray menu).
+
+### Hotkeys on Wayland (and the always-works fallback)
+
+Wayland desktops don't let apps grab keys globally unless the desktop provides
+the **GlobalShortcuts portal** — GreenRoom requests it automatically (KDE
+Plasma supports it; approve the prompt and manage the keys in System Settings
+→ Shortcuts). X11 sessions, XWayland games (Proton), and Steam Deck Game Mode
+work without any of this.
+
+If globals still don't reach you, use the fallback that works everywhere:
+GreenRoom is single-instance, so invoking the binary again just signals the
+running app. Bind these to any key in your desktop's custom-shortcut settings
+(or a Steam Deck back button via Steam Input):
+
+```bash
+GreenRoom.AppImage --hud   # toggle the Game Bar HUD
+GreenRoom.AppImage --mic   # toggle your microphone
+```
 
 ## Requirements & known limitations
 

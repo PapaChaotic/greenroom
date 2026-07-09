@@ -12,12 +12,14 @@
   </div>
 
   <div class="field">
-    <label for="hk-gamebar">Game Bar view hotkey</label>
+    <label for="hk-gamebar">Game Bar HUD hotkey</label>
     <input type="text" id="hk-gamebar" readonly placeholder="Click, then press a key combo — Esc clears" />
     <p class="hint">
-      On Wayland desktops without the GlobalShortcuts portal, hotkeys work
-      while GreenRoom is focused. On X11 (and Steam Deck Game Mode) they work
-      globally.
+      Wayland desktops need the GlobalShortcuts portal for these to work
+      globally (KDE: approve the prompt, then manage in System Settings →
+      Shortcuts). Universal fallback: bind a system shortcut that runs
+      <b>GreenRoom.AppImage --hud</b> or <b>--mic</b> — it controls the
+      running app from anywhere.
     </p>
   </div>
 

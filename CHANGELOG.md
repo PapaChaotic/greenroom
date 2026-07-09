@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.9.0-beta.4 (2026-07-09)
+
+### Fixed
+- **Hotkeys now work while your game is focused.** GreenRoom requests the
+  Wayland GlobalShortcuts portal (KDE: approve the prompt once). New
+  universal fallback for any desktop: bind a system shortcut to
+  `GreenRoom.AppImage --hud` or `--mic` — the single-instance app picks the
+  signal up from anywhere, no portal needed.
+
+### Changed
+- Summoning the Game Bar HUD now sends the main window to the tray, so only
+  the pill floats over your game.
+
 ## 0.9.0-beta.3 (2026-07-09)
 
 ### Changed
