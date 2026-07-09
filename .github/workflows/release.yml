@@ -14,6 +14,12 @@ on:
 permissions:
   contents: write
 
+# Serialize release runs: a push landing while a build is in flight queues
+# behind it, sees the freshly created tag, and gate-skips — no duplicates.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 jobs:
   gate:
     runs-on: ubuntu-latest
