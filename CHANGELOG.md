@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.9.4 (2026-07-09)
+
+### Fixed
+- **False "previous session crashed" reports.** A second launch (or a
+  quick relaunch) ran startup code it shouldn't have, reading and deleting
+  the running instance's crash sentinel — producing phantom crash dialogs.
+  Only the primary instance now touches that state.
+- **Crash reports can now actually be kept.** The crash dialog always saves
+  a full local copy (`last-crash-report.txt`) and spells out that the GitHub
+  path needs you signed in and clicking "Submit new issue". Added a "Just
+  save locally" option, and the browser issue body is trimmed to stay under
+  GitHub's URL length limit (the local copy is always complete).
+
 ## 0.9.3 (2026-07-09)
 
 ### Fixed

@@ -32,8 +32,10 @@ app.commandLine.appendSwitch('disable-features', 'Vulkan');
 // Tray apps must be single-instance: a second launch signals the first.
 // That also gives us a hotkey fallback that works on EVERY desktop: bind a
 // system shortcut to `greenroom --hud` (or --mic) and it controls the
-// running instance.
-if (!app.requestSingleInstanceLock()) {
+// running instance. A secondary instance must do NOTHING else — no crash
+// sentinel, no whenReady setup — or it corrupts the primary's state.
+const hasInstanceLock = app.requestSingleInstanceLock();
+if (!hasInstanceLock) {
   app.quit();
 } else {
   app.on('second-instance', (_e, argv) => {
@@ -162,6 +164,8 @@ const mainWindowOpts = {
 };
 
 // --- Lifecycle ---------------------------------------------------------------
+// Only the primary instance boots the app; a secondary already called quit().
+if (hasInstanceLock)
 app.whenReady().then(() => {
   crash.init(REPO_URL);
   security.configureSession();

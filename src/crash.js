@@ -49,26 +49,41 @@ function issueBody(entry) {
   ].join('\n');
 }
 
+function reportFile() {
+  return path.join(app.getPath('userData'), 'last-crash-report.txt');
+}
+
 async function offerReport(entry) {
   if (reporting || !repoUrl) return;
   reporting = true;
   try {
+    // Always save a local copy first, so the report survives even if the
+    // GitHub submission is never completed in the browser.
+    const report = issueBody(entry);
+    try {
+      fs.writeFileSync(reportFile(), report, { mode: 0o600 });
+    } catch {}
+
     const { response } = await dialog.showMessageBox({
       type: 'error',
       title: 'GreenRoom crashed',
       message: `A component crashed (${entry.kind}: ${entry.reason ?? 'unknown'}).`,
       detail:
-        'Report it on GitHub? A pre-filled issue will open in your browser — ' +
-        'you can review everything before submitting. Nothing is sent automatically.',
-      buttons: ['Report on GitHub', 'Dismiss'],
+        'Report it on GitHub? This opens a pre-filled issue in your browser — ' +
+        'you must be signed in to GitHub and click "Submit new issue" to send ' +
+        'it (nothing is sent automatically). A copy is also saved locally:\n' +
+        reportFile(),
+      buttons: ['Open GitHub issue', 'Just save locally', 'Dismiss'],
       defaultId: 0,
-      cancelId: 1,
+      cancelId: 2,
     });
     if (response === 0) {
       const title = encodeURIComponent(
         `[crash] ${entry.kind}: ${entry.reason ?? 'unknown'} (v${app.getVersion()})`
       );
-      const body = encodeURIComponent(issueBody(entry));
+      // GitHub rejects overly long issue URLs (~8KB); the local file always
+      // has the full report, so a trimmed body in the URL is fine.
+      const body = encodeURIComponent(report.slice(0, 4000));
       shell.openExternal(
         `${repoUrl}/issues/new?labels=crash&title=${title}&body=${body}`
       );
