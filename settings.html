@@ -1,0 +1,57 @@
+<meta charset="utf-8" />
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'self'; style-src 'self' 'unsafe-inline';" />
+<link rel="stylesheet" href="styles.css" />
+
+<body class="settings">
+  <h1>Settings</h1>
+
+  <div class="field">
+    <label for="hk-mic">Mic toggle hotkey (push-to-talk)</label>
+    <input type="text" id="hk-mic" readonly placeholder="Click, then press a key combo — Esc clears" />
+  </div>
+
+  <div class="field">
+    <label for="hk-gamebar">Game Bar view hotkey</label>
+    <input type="text" id="hk-gamebar" readonly placeholder="Click, then press a key combo — Esc clears" />
+    <p class="hint">
+      On Wayland desktops without the GlobalShortcuts portal, hotkeys work
+      while GreenRoom is focused. On X11 (and Steam Deck Game Mode) they work
+      globally.
+    </p>
+  </div>
+
+  <div class="field">
+    <label for="ui-scale">UI scale</label>
+    <select id="ui-scale">
+      <option value="auto">Auto (125% on Steam Deck-size screens)</option>
+      <option value="1">100%</option>
+      <option value="1.25">125%</option>
+      <option value="1.5">150%</option>
+    </select>
+  </div>
+
+  <div class="row">
+    <input type="checkbox" id="close-tray" />
+    <label for="close-tray" style="margin:0">Keep running in tray when window closes</label>
+  </div>
+
+  <div class="row">
+    <input type="checkbox" id="check-updates" />
+    <label for="check-updates" style="margin:0">Check for updates automatically</label>
+  </div>
+
+  <div class="row">
+    <button id="check-now" class="secondary">Check for updates now</button>
+  </div>
+
+  <p id="status"></p>
+
+  <div class="about">
+    <span id="about-version"></span><br />
+    GreenRoom is an unofficial client and is not affiliated with, endorsed by,
+    or sponsored by Microsoft. Xbox is a trademark of Microsoft Corporation.
+  </div>
+
+  <script src="settings.js"></script>
+</body>

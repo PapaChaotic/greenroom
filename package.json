@@ -1,0 +1,67 @@
+{
+  "name": "greenroom",
+  "productName": "GreenRoom",
+  "version": "0.9.0-beta.1",
+  "description": "Unofficial Xbox party chat client for Linux. Not affiliated with or endorsed by Microsoft.",
+  "main": "main.js",
+  "author": "Travis Atkinson",
+  "license": "MIT",
+  "homepage": "https://github.com/REPLACE_GITHUB_OWNER/greenroom",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/REPLACE_GITHUB_OWNER/greenroom.git"
+  },
+  "scripts": {
+    "start": "electron .",
+    "smoke": "GR_SMOKE=1 electron .",
+    "dist": "electron-builder --linux --publish never",
+    "dist:appimage": "electron-builder --linux AppImage --publish never",
+    "release": "electron-builder --linux --publish always",
+    "audit:security": "npm audit --audit-level=high"
+  },
+  "dependencies": {
+    "electron-updater": "^6.3.0"
+  },
+  "devDependencies": {
+    "@electron/fuses": "^1.8.0",
+    "electron": "^43.1.0",
+    "electron-builder": "^26.0.0"
+  },
+  "build": {
+    "appId": "io.github.replace-github-owner.greenroom",
+    "productName": "GreenRoom",
+    "executableName": "greenroom",
+    "asar": true,
+    "files": [
+      "main.js",
+      "preload.js",
+      "index.html",
+      "renderer.js",
+      "styles.css",
+      "settings.html",
+      "settings.js",
+      "src/**/*",
+      "assets/**/*"
+    ],
+    "afterPack": "build/fuses.js",
+    "linux": {
+      "target": ["AppImage", "deb", "rpm"],
+      "icon": "assets/icon.png",
+      "category": "Network",
+      "synopsis": "Unofficial Xbox party chat client",
+      "desktop": {
+        "entry": {
+          "Name": "GreenRoom (Beta)",
+          "Comment": "Unofficial Xbox party chat — not affiliated with Microsoft",
+          "Categories": "Network;Chat;Game;"
+        }
+      }
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "REPLACE_GITHUB_OWNER",
+      "repo": "greenroom",
+      "releaseType": "prerelease"
+    }
+  }
+}

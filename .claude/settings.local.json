@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(npm --version)",
+      "Bash(sudo dnf install -y nodejs npm)",
+      "Bash(mkdir -p ~/.local/opt)",
+      "Read(//home/travisa/.local/**)",
+      "Bash(curl -fsSL https://nodejs.org/dist/v22.17.0/node-v22.17.0-linux-x64.tar.xz -o node.tar.xz)",
+      "Bash(tar -xf node.tar.xz)",
+      "Bash(mv node-v22.17.0-linux-x64 node)",
+      "Bash(chmod +x /run/media/travisa/NVME240/XboxPartyChat/run.sh)",
+      "Bash(pkill -f \"XboxPartyChat/node_modules\")",
+      "Bash(gh auth *)",
+      "Bash(magick -size 512x512 xc:none -fill '#107c10' -draw 'roundrectangle 16,16 496,496 96,96' -fill white -draw 'roundrectangle 112,140 400,336 52,52' -draw 'polygon 168,328 168,412 256,336' -fill '#107c10' -draw 'circle 184,238 184,258' -draw 'circle 256,238 256,258' -draw 'circle 328,238 328,258' assets/icon.png)",
+      "Bash(magick assets/icon.png -resize 64x64 assets/tray.png)",
+      "Bash(magick assets/icon.png -modulate 100,0 -fill '#c42b1c' -draw 'circle 384,384 384,486' assets/tray-muted-base.png)",
+      "Bash(magick assets/tray-muted-base.png -resize 64x64 assets/tray-muted.png)"
+    ]
+  }
+}

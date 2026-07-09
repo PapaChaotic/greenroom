@@ -1,0 +1,51 @@
+<meta charset="utf-8" />
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'self'; style-src 'self' 'unsafe-inline';" />
+<link rel="stylesheet" href="styles.css" />
+
+<div id="app">
+  <!-- Game Bar-style titlebar -->
+  <header id="titlebar">
+    <div class="tb-left">
+      <span class="logo">GR</span>
+      <span class="app-name">GreenRoom</span>
+      <span class="beta">BETA</span>
+    </div>
+
+    <nav class="tb-nav">
+      <button id="nav-back"    title="Back">‹</button>
+      <button id="nav-forward" title="Forward">›</button>
+      <button id="nav-reload"  title="Reload">⟳</button>
+      <button id="nav-home"    title="Home">⌂</button>
+    </nav>
+
+    <div class="tb-drag"></div>
+
+    <div class="tb-actions">
+      <button id="mic-btn" title="Toggle microphone">🎙</button>
+      <button id="settings-btn" title="Settings">⚙</button>
+    </div>
+
+    <div class="tb-controls">
+      <button id="win-min"   class="wc" title="Minimize">—</button>
+      <button id="win-max"   class="wc" title="Maximize">▢</button>
+      <button id="win-close" class="wc wc-close" title="Close to tray">✕</button>
+    </div>
+  </header>
+
+  <div id="hotkey-note" class="hidden"></div>
+
+  <div id="loading">
+    <div class="spinner"></div>
+    <p>Connecting to Xbox…</p>
+  </div>
+
+  <webview
+    id="view"
+    src="https://www.xbox.com/play"
+    partition="persist:xbox"
+    allowpopups
+  ></webview>
+</div>
+
+<script src="renderer.js"></script>

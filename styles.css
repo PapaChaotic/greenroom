@@ -1,0 +1,301 @@
+:root {
+  --accent: #107c10;
+  --accent-bright: #16c60c;
+  --bar-bg: #0b0f0b;
+  --bar-bg-2: #141a14;
+  --text: #e8f0e8;
+  --text-dim: #8fa08f;
+  --danger: #c42b1c;
+  --titlebar-h: 40px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: var(--bar-bg);
+  color: var(--text);
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---- Titlebar (Game Bar likeness) ---- */
+#titlebar {
+  height: var(--titlebar-h);
+  flex: 0 0 var(--titlebar-h);
+  display: flex;
+  align-items: center;
+  background: linear-gradient(180deg, var(--bar-bg-2), var(--bar-bg));
+  border-bottom: 1px solid rgba(22, 198, 12, 0.25);
+  -webkit-app-region: no-drag;
+  user-select: none;
+}
+
+.tb-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+}
+
+.logo {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.app-name {
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.beta {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--accent-bright);
+  border: 1px solid var(--accent-bright);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+
+.tb-nav,
+.tb-actions {
+  display: flex;
+  gap: 2px;
+  padding: 0 6px;
+}
+
+.tb-nav button,
+.tb-actions button {
+  width: 30px;
+  height: 26px;
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 15px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.tb-nav button:hover,
+.tb-actions button:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+}
+
+#mic-btn.muted {
+  color: var(--danger);
+}
+
+/* The wide draggable region that lets you move the window. */
+.tb-drag {
+  flex: 1;
+  height: 100%;
+  -webkit-app-region: drag;
+}
+
+.tb-controls {
+  display: flex;
+}
+
+.wc {
+  width: 44px;
+  height: var(--titlebar-h);
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.wc:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text);
+}
+
+.wc-close:hover {
+  background: var(--danger);
+  color: #fff;
+}
+
+/* ---- Compact "Game Bar" view: hide chrome the small panel doesn't need ---- */
+body.compact .app-name,
+body.compact .beta,
+body.compact .tb-nav {
+  display: none;
+}
+
+body.compact .wc {
+  width: 34px;
+}
+
+/* ---- Webview ---- */
+#view {
+  flex: 1;
+  width: 100%;
+  border: none;
+  background: #000;
+}
+
+/* ---- Hotkey fallback notice ---- */
+#hotkey-note {
+  position: absolute;
+  top: calc(var(--titlebar-h) + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 80%;
+  background: var(--bar-bg-2);
+  border: 1px solid rgba(22, 198, 12, 0.4);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 12px;
+  color: var(--text-dim);
+  z-index: 20;
+  transition: opacity 0.3s ease;
+}
+
+#hotkey-note.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---- Loading overlay ---- */
+#loading {
+  position: absolute;
+  inset: var(--titlebar-h) 0 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  background: var(--bar-bg);
+  color: var(--text-dim);
+  z-index: 10;
+  transition: opacity 0.25s ease;
+}
+
+#loading.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.spinner {
+  width: 46px;
+  height: 46px;
+  border: 4px solid rgba(255, 255, 255, 0.12);
+  border-top-color: var(--accent-bright);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---- Settings window ---- */
+body.settings {
+  padding: 20px 24px;
+  overflow-y: auto;
+}
+
+.settings h1 {
+  font-size: 16px;
+  margin-bottom: 14px;
+}
+
+.settings .field {
+  margin-bottom: 14px;
+}
+
+.settings label {
+  display: block;
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+
+.settings input[type="text"],
+.settings select {
+  width: 100%;
+  padding: 8px 10px;
+  background: var(--bar-bg-2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.settings input.recording {
+  border-color: var(--accent-bright);
+  outline: none;
+}
+
+.settings .row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.settings .hint {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+.settings button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.settings button.secondary {
+  background: var(--bar-bg-2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text);
+}
+
+.settings button:hover {
+  filter: brightness(1.15);
+}
+
+.settings .about {
+  margin-top: 18px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+.settings #status {
+  font-size: 12px;
+  color: var(--accent-bright);
+  min-height: 16px;
+  margin-top: 6px;
+}

@@ -1,0 +1,27 @@
+name: Build & publish beta release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Security gate — fail the release on known vulnerabilities
+        run: npm audit --audit-level=high
+      - name: Smoke test
+        run: xvfb-run --auto-servernum npm run smoke
+      - name: Build AppImage, deb, rpm and publish as prerelease
+        run: npx electron-builder --linux --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
