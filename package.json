@@ -1,7 +1,7 @@
 {
   "name": "greenroom",
   "productName": "GreenRoom",
-  "version": "0.9.4",
+  "version": "0.10.0",
   "description": "Unofficial Xbox party chat client for Linux. Not affiliated with or endorsed by Microsoft.",
   "main": "main.js",
   "author": {
