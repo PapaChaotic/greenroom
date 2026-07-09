@@ -13,6 +13,22 @@ can't give you.
 > party chat rendered in a hardened Chromium shell — we don't touch the
 > protocol, your credentials, or your traffic.
 
+## Screenshots
+
+**The app** — the full Xbox experience in a Game Bar–style shell:
+
+![GreenRoom main window](docs/screenshots/main-window.png)
+
+**Party chat** — start a party from the social panel, exactly like on Xbox:
+
+![Party panel with Start a party](docs/screenshots/party-panel.png)
+
+**The Game Bar HUD** — `Ctrl+Shift+G` while gaming: mic toggle, party-audio
+light, and a 📌 pin, in a translucent pill you can drag anywhere. The full
+app stays tucked away in the tray:
+
+![Game Bar HUD pill](docs/screenshots/hud-pill.png)
+
 ## Features
 
 - 🎙 **Party voice chat** — mic permission is pre-scoped to xbox.com; voice just works
