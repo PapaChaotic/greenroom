@@ -38,14 +38,20 @@ window.greenroom.getMic().then(renderMic);
 document.getElementById('settings-btn').onclick = () =>
   window.greenroom.openSettings();
 
-// --- Controller indicator ---
+// --- Controller indicator (two-stage) ---
+// dim: nothing plugged in · amber: OS sees it, press a button to activate ·
+// green: the Xbox page can use it.
 const pad = document.getElementById('pad-indicator');
-window.greenroom.onGamepadState((count) => {
-  pad.classList.toggle('connected', count > 0);
+window.greenroom.onGamepadState(({ os, page }) => {
+  pad.classList.toggle('connected', page > 0);
+  pad.classList.toggle('standby', page === 0 && os > 0);
   pad.title =
-    count > 0
-      ? `Controller detected (${count})`
-      : "No controller detected yet — press a button on it. Xbox's menus may ignore it until a game is running.";
+    page > 0
+      ? `Controller active (${page})`
+      : os > 0
+        ? 'Controller connected — press any button on it so Xbox can use it ' +
+          '(the "No controller detected" prompt goes away once you do)'
+        : 'No controller detected';
 });
 
 // --- Hotkey status (Wayland fallback notice) ---

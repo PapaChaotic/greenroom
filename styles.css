@@ -114,6 +114,11 @@ body,
   cursor: default;
 }
 
+#pad-indicator.standby {
+  opacity: 0.9;
+  filter: drop-shadow(0 0 3px #e0a020) saturate(0.4) sepia(0.5);
+}
+
 #pad-indicator.connected {
   opacity: 1;
   filter: drop-shadow(0 0 3px var(--accent-bright));

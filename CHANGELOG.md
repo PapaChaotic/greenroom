@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.10.1 (2026-07-09)
+
+### Fixed
+- **NVIDIA hardware decode actually engages now.** The GPU process is told
+  which VA-API driver to load (`LIBVA_DRIVER_NAME=nvidia`, set only when an
+  NVIDIA GPU is present) — without it, Chromium silently fell back to
+  software decoding even with the shim installed.
+- **Two-stage controller indicator.** The titlebar 🎮 now reads the kernel's
+  device list: **amber** = controller plugged in but the page can't use it
+  yet (press any button — a browser privacy rule no app can bypass),
+  **green** = active. Explains Xbox's "No controller detected" prompt
+  instead of leaving users to think a driver is missing.
+
 ## 0.10.0 (2026-07-09)
 
 ### Added

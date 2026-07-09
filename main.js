@@ -1,4 +1,5 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
+const fs = require('fs');
 
 const config = require('./src/config');
 const security = require('./src/security');
@@ -27,6 +28,11 @@ if (config.get().videoDecode !== 'software') {
     'AcceleratedVideoDecodeLinuxGL',
     'VaapiIgnoreDriverChecks'
   );
+  // On NVIDIA, libva doesn't reliably pick the VA-API shim on its own —
+  // the GPU process needs to be told which driver to load.
+  if (fs.existsSync('/proc/driver/nvidia/version')) {
+    process.env.LIBVA_DRIVER_NAME ||= 'nvidia';
+  }
 }
 app.commandLine.appendSwitch('enable-features', enableFeatures.join(','));
 
@@ -141,19 +147,33 @@ function startHudFeed() {
     const status = await ptt.getStatus();
     windows.getHud()?.webContents.send('hud:status', status);
   }, 300);
-  // Slow always-on poll: controller indicator for the titlebar. (Chromium
-  // only exposes gamepads to the page after a button press — the indicator
-  // lighting up tells the user the controller IS seen by the app, even
-  // while Xbox's home UI ignores it until a game starts.)
-  let lastPads = -1;
+  // Slow always-on poll: two-stage controller indicator for the titlebar.
+  // `os` = the controller is physically connected (read from the kernel);
+  // `page` = the Xbox page can actually use it (Chromium only exposes
+  // gamepads to a page after a button press). Xbox's own "No controller
+  // detected" prompt just means the button press hasn't happened yet.
+  let last = '';
   setInterval(async () => {
     const { pads } = await ptt.getStatus();
-    if (pads === lastPads) return;
-    lastPads = pads;
+    const state = { os: osGamepadCount(), page: pads };
+    const key = `${state.os}/${state.page}`;
+    if (key === last) return;
+    last = key;
     for (const win of BrowserWindow.getAllWindows()) {
-      win.webContents.send('gamepad:state', pads);
+      win.webContents.send('gamepad:state', state);
     }
   }, 3000);
+}
+
+// Count game controllers the KERNEL sees (joystick handlers), regardless of
+// whether the page has been given access yet.
+function osGamepadCount() {
+  try {
+    const txt = fs.readFileSync('/proc/bus/input/devices', 'utf8');
+    return txt.split('\n\n').filter((b) => /Handlers=.*\bjs\d/.test(b)).length;
+  } catch {
+    return 0;
+  }
 }
 
 // --- Per-webContents hardening + feature wiring -----------------------------

@@ -97,12 +97,12 @@ GreenRoom.AppImage --mic   # toggle your microphone
 
 ## FAQ / quirks
 
-**My controller isn't detected until a game starts.** Two separate things:
-browsers only expose gamepads after you *press a button* (privacy rule), and
-Microsoft's home menus mostly ignore controllers until a stream is running.
-Press a button and watch the 🎮 icon in GreenRoom's titlebar light up — that
-means the app sees your controller and it will work in-game, even while the
-Xbox menus ignore it. That part is Microsoft's web UI, not a missing driver.
+**Xbox says "No controller detected."** Browsers only expose gamepads to a
+page after you *press a button on the controller* (a privacy rule — no app
+can bypass it). Watch the 🎮 icon in GreenRoom's titlebar: **amber** means
+the controller is plugged in and waiting — press any button and it turns
+**green**, and Microsoft's prompt goes away. Microsoft's home menus may
+still ignore the controller until a game is streaming; in-game it works.
 
 **The stream is 30 fps — how do I get 60?** Set stream quality to
 **Maximum** and video decoding to **Hardware** (both in Settings), then
