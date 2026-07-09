@@ -14,6 +14,8 @@ const DEFAULTS = {
   uiScale: 'auto',
   checkUpdates: true,
   closeToTray: true,
+  hudPinned: false, // pinned HUD ignores click-out dismissal
+  hudHidesApp: true, // summoning the HUD sends the main window to the tray
 };
 
 const VALID_SCALES = new Set(['auto', 1, 1.25, 1.5]);
@@ -43,6 +45,8 @@ function sanitize(raw) {
   if (VALID_SCALES.has(raw.uiScale)) out.uiScale = raw.uiScale;
   if (typeof raw.checkUpdates === 'boolean') out.checkUpdates = raw.checkUpdates;
   if (typeof raw.closeToTray === 'boolean') out.closeToTray = raw.closeToTray;
+  if (typeof raw.hudPinned === 'boolean') out.hudPinned = raw.hudPinned;
+  if (typeof raw.hudHidesApp === 'boolean') out.hudHidesApp = raw.hudHidesApp;
   return out;
 }
 

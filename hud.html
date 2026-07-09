@@ -35,6 +35,12 @@
   }
   button:hover { background: rgba(255, 255, 255, 0.12); }
   #mic.muted { color: #ff6b5e; }
+  #pin { font-size: 14px; opacity: 0.55; }
+  #pin.pinned {
+    opacity: 1;
+    color: #16c60c;
+    background: rgba(22, 198, 12, 0.15);
+  }
   /* Party audio activity light */
   #activity {
     -webkit-app-region: no-drag;
@@ -54,6 +60,7 @@
   <span class="logo">GR</span>
   <button id="mic" title="Toggle microphone">🎙</button>
   <span id="activity" title="Party audio activity"></span>
+  <button id="pin" title="Pin — stay open when clicking elsewhere">📌</button>
   <button id="open" title="Open GreenRoom">⌐</button>
   <button id="hide" title="Hide (Esc)">✕</button>
 </div>

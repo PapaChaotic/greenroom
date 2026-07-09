@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.9.0-beta.5 (2026-07-09)
+
+### Added
+- **📌 Pin button on the Game Bar HUD** — while pinned, clicking outside no
+  longer dismisses it (Esc, ✕, and the hotkey still do). Pin state is
+  remembered.
+- **Settings: "Send app to tray when opening the Game Bar HUD"** — untick it
+  to keep the main window and the HUD up at the same time.
+
 ## 0.9.0-beta.4 (2026-07-09)
 
 ### Fixed

@@ -21,6 +21,7 @@ function render() {
   $('hk-gamebar').value = settings.hotkeys.gameBar || '';
   $('ui-scale').value = String(settings.uiScale);
   $('close-tray').checked = settings.closeToTray;
+  $('hud-hides-app').checked = settings.hudHidesApp;
   $('check-updates').checked = settings.checkUpdates;
 }
 
@@ -80,6 +81,9 @@ $('ui-scale').addEventListener('change', (e) => {
 });
 $('close-tray').addEventListener('change', (e) =>
   save({ closeToTray: e.target.checked })
+);
+$('hud-hides-app').addEventListener('change', (e) =>
+  save({ hudHidesApp: e.target.checked })
 );
 $('check-updates').addEventListener('change', (e) =>
   save({ checkUpdates: e.target.checked })

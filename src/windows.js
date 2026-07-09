@@ -1,5 +1,6 @@
 const { BrowserWindow, screen } = require('electron');
 const path = require('path');
+const config = require('./config');
 
 let main = null;
 let settings = null;
@@ -65,7 +66,7 @@ function createMain(config, { onClose }) {
 
 function createHud() {
   hud = new BrowserWindow({
-    width: 252,
+    width: 296,
     height: 64,
     frame: false,
     transparent: true,
@@ -85,8 +86,10 @@ function createHud() {
   hud.webContents.on('will-navigate', (e) => e.preventDefault());
   hud.setAlwaysOnTop(true, 'screen-saver');
   hud.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
-  // Click-out dismissal (focus moving to one of our own windows doesn't count).
+  // Click-out dismissal (focus moving to one of our own windows doesn't
+  // count, and a pinned HUD stays put until Esc, ✕, or the hotkey).
   hud.on('blur', () => {
+    if (config.get().hudPinned) return;
     if (hud?.isVisible() && !BrowserWindow.getFocusedWindow()) hideHud();
   });
   hud.on('closed', () => (hud = null));
@@ -96,12 +99,20 @@ function createHud() {
 function showHud() {
   if (!hud || hud.isDestroyed()) createHud();
   // Game Bar semantics: the HUD replaces the app — the full window goes to
-  // the tray so only the pill floats over your game.
-  if (main && !main.isDestroyed() && main.isVisible()) main.hide();
+  // the tray so only the pill floats over your game. Optional in Settings
+  // for people who want both up.
+  if (
+    config.get().hudHidesApp &&
+    main &&
+    !main.isDestroyed() &&
+    main.isVisible()
+  ) {
+    main.hide();
+  }
   const { workArea } = screen.getDisplayNearestPoint(
     screen.getCursorScreenPoint()
   );
-  hud.setPosition(workArea.x + workArea.width - 252 - 16, workArea.y + 16);
+  hud.setPosition(workArea.x + workArea.width - 296 - 16, workArea.y + 16);
   hud.show();
   hud.focus();
 }
