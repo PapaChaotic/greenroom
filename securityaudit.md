@@ -60,6 +60,28 @@ every Audit 1 boundary.
 
 ---
 
+## Addendum: 2026-07-09 — boundary change in v0.10.3
+
+**Change:** on NVIDIA GPUs with Hardware video decoding selected (the
+default), the GPU-*process* sandbox is disabled (`--disable-gpu-sandbox`).
+
+**Why:** the NVIDIA VA-API shim (nvidia-vaapi-driver) initializes CUDA
+inside Chromium's GPU process; the GPU sandbox forbids this, making
+hardware decode silently impossible on NVIDIA — this is the shim's
+documented Chromium limitation, verified empirically on an RTX 4080
+(decode stayed at software speeds with all other plumbing proven correct
+via boot logging).
+
+**Risk assessment:** the GPU process parses media streams and shader work.
+Content reaching it is constrained by the navigation allowlist
+(Microsoft/Xbox domains only) — the same trust already extended for mic
+access. Renderer, webview, and shell sandboxes are unchanged. Mitigation
+for the risk-averse: Settings → Video decoding → Software restores the
+GPU sandbox (at the cost of 60 fps streams). AMD/Intel systems never
+disable it.
+
+---
+
 ## Audit 1: 2026-07-09 — initial audit (pre-release wrapper)
 
 **Scope:** first audit of the original minimal wrapper (main window +

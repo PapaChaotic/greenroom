@@ -30,6 +30,7 @@ All boundaries live in [`src/security.js`](src/security.js) for single-point aud
 | Page hooks | The code injected into the Xbox page ([`src/ptt.js`](src/ptt.js)) — mic control, party-audio sensing, stream-bitrate negotiation, audio gain, gamepad presence — interpolates only booleans/our own numeric settings; no user or remote data flows into `executeJavaScript` |
 | Mute integrity | Mute state is re-asserted into the page every 10s, so page scripts can't silently re-enable the mic while the UI shows muted |
 | CLI signals | `--hud` / `--mic` signal the running instance via Electron's single-instance lock, scoped to this user's profile — other local users can't send them |
+| GPU sandbox (NVIDIA only) | With **Hardware video decoding on an NVIDIA GPU**, the GPU-*process* sandbox is disabled — the NVIDIA VA-API shim must initialize CUDA there, which that sandbox forbids (documented nvidia-vaapi-driver limitation). Renderers, the Xbox webview, and shell windows remain fully sandboxed, and the navigation allowlist still controls what content ever reaches the decoder. Selecting **Software** decoding in Settings restores the GPU sandbox. AMD/Intel systems are unaffected |
 
 ## Packaged-binary hardening (enforced at build time)
 

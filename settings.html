@@ -47,8 +47,10 @@
     <p class="hint">
       Takes effect after restarting GreenRoom. NVIDIA cards also need the
       system package <b>libva-nvidia-driver</b> (Nobara/Fedora:
-      <b>sudo dnf install libva-nvidia-driver</b>). Choose Software only if
-      you see graphical glitches.
+      <b>sudo dnf install libva-nvidia-driver</b>), and hardware decoding on
+      NVIDIA relaxes Chromium's GPU-process sandbox (see SECURITY.md —
+      renderers stay sandboxed; pick Software to keep it). Choose Software
+      if you see graphical glitches.
     </p>
   </div>
 

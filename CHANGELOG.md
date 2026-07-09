@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.10.3 (2026-07-09)
+
+### Fixed
+- **NVIDIA hardware decode, final piece: the GPU-process sandbox.** The
+  NVIDIA VA-API shim must initialize CUDA inside Chromium's GPU process,
+  which that sandbox forbids (the shim's documented Chromium limitation).
+  With Hardware decoding on an NVIDIA GPU, GreenRoom now relaxes the
+  GPU-process sandbox only — renderers, the Xbox webview, and shell windows
+  stay fully sandboxed, and the navigation allowlist still controls what
+  reaches the decoder. Selecting Software decoding restores it. Documented
+  in SECURITY.md and the audit log. AMD/Intel unaffected.
+
 ## 0.10.2 (2026-07-09)
 
 ### Fixed

@@ -23,11 +23,24 @@ const REPO_URL = pkg.homepage;
 //   VaapiIgnoreDriverChecks lets the NVIDIA VA-API shim through Chromium's
 //   allowlist (still needs the system package, e.g. libva-nvidia-driver).
 const enableFeatures = ['GlobalShortcutsPortal'];
+const nvidiaHwDecode =
+  config.get().videoDecode !== 'software' &&
+  fs.existsSync('/proc/driver/nvidia/version');
 if (config.get().videoDecode !== 'software') {
   enableFeatures.push(
     'AcceleratedVideoDecodeLinuxGL',
     'VaapiIgnoreDriverChecks'
   );
+}
+if (nvidiaHwDecode) {
+  // The NVIDIA VA-API shim must initialize CUDA inside the GPU process,
+  // which Chromium's GPU-process sandbox forbids — this is the documented
+  // Chromium limitation of nvidia-vaapi-driver. Relax ONLY that sandbox
+  // (renderers, the Xbox webview, and shell windows stay fully sandboxed;
+  // the navigation allowlist still controls what reaches the decoder).
+  // Users can keep the GPU sandbox by choosing Software decoding.
+  // Documented in SECURITY.md.
+  app.commandLine.appendSwitch('disable-gpu-sandbox');
 }
 app.commandLine.appendSwitch('enable-features', enableFeatures.join(','));
 
