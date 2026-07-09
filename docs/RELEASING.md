@@ -3,10 +3,10 @@
 ## One-time setup (do this first)
 
 1. Create the GitHub repository (e.g. `greenroom`) under your account.
-2. Replace every `REPLACE_GITHUB_OWNER` with your GitHub username:
+2. Replace every `PapaChaotic` with your GitHub username:
    ```bash
-   grep -rl REPLACE_GITHUB_OWNER --exclude-dir=node_modules --exclude-dir=.git . \
-     | xargs sed -i 's/REPLACE_GITHUB_OWNER/your-username/g'
+   grep -rl PapaChaotic --exclude-dir=node_modules --exclude-dir=.git . \
+     | xargs sed -i 's/PapaChaotic/your-username/g'
    ```
    Also update `build.appId` in `package.json`
    (`io.github.your-username.greenroom`).

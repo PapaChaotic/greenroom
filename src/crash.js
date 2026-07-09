@@ -52,7 +52,7 @@ function issueBody(entry) {
 }
 
 async function offerReport(entry) {
-  if (reporting || !repoUrl || repoUrl.includes('REPLACE_GITHUB_OWNER')) return;
+  if (reporting || !repoUrl) return;
   reporting = true;
   try {
     const { response } = await dialog.showMessageBox({

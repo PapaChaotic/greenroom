@@ -25,7 +25,7 @@ can't give you.
 
 ## Install
 
-Grab the latest **beta** from [Releases](https://github.com/REPLACE_GITHUB_OWNER/greenroom/releases):
+Grab the latest **beta** from [Releases](https://github.com/PapaChaotic/greenroom/releases):
 
 | Package | For | Updates |
 |---|---|---|

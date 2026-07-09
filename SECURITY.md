@@ -7,7 +7,7 @@ keep them enforced.
 
 ## Reporting a vulnerability
 
-Open a [GitHub security advisory](https://github.com/REPLACE_GITHUB_OWNER/greenroom/security/advisories/new)
+Open a [GitHub security advisory](https://github.com/PapaChaotic/greenroom/security/advisories/new)
 (preferred), or an issue with the `security` label if it isn't sensitive.
 Beta-stage response target: acknowledgment within a week.
 

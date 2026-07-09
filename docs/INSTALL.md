@@ -1,6 +1,6 @@
 # Installing GreenRoom
 
-All builds are on the [Releases page](https://github.com/REPLACE_GITHUB_OWNER/greenroom/releases).
+All builds are on the [Releases page](https://github.com/PapaChaotic/greenroom/releases).
 During beta, releases are marked **Pre-release**.
 
 ## AppImage (recommended — every distro, auto-updates)

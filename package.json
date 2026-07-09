@@ -6,10 +6,10 @@
   "main": "main.js",
   "author": "Travis Atkinson",
   "license": "MIT",
-  "homepage": "https://github.com/REPLACE_GITHUB_OWNER/greenroom",
+  "homepage": "https://github.com/PapaChaotic/greenroom",
   "repository": {
     "type": "git",
-    "url": "https://github.com/REPLACE_GITHUB_OWNER/greenroom.git"
+    "url": "https://github.com/PapaChaotic/greenroom.git"
   },
   "scripts": {
     "start": "electron .",
@@ -28,7 +28,7 @@
     "electron-builder": "^26.0.0"
   },
   "build": {
-    "appId": "io.github.replace-github-owner.greenroom",
+    "appId": "io.github.papachaotic.greenroom",
     "productName": "GreenRoom",
     "executableName": "greenroom",
     "asar": true,
@@ -59,7 +59,7 @@
     },
     "publish": {
       "provider": "github",
-      "owner": "REPLACE_GITHUB_OWNER",
+      "owner": "PapaChaotic",
       "repo": "greenroom",
       "releaseType": "prerelease"
     }
