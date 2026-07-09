@@ -5,6 +5,9 @@ security is treated as a core feature, not an afterthought. This document is
 the complete inventory of the app's trust boundaries and the processes that
 keep them enforced.
 
+Audit history — dated findings, fixes, and verification evidence — lives in
+[securityaudit.md](securityaudit.md).
+
 ## Reporting a vulnerability
 
 Open a [GitHub security advisory](https://github.com/PapaChaotic/greenroom/security/advisories/new)
