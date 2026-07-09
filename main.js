@@ -111,8 +111,19 @@ if (!hasInstanceLock) {
   app.on('second-instance', (_e, argv) => {
     if (argv.includes('--hud')) actions.gameBar();
     else if (argv.includes('--mic')) actions.toggleMic();
+    else if (argv.includes('--diag')) openDiagWindows();
     else windows.show();
   });
+}
+
+// `greenroom --diag` while running: opens Chromium's own diagnostic pages.
+// chrome://webrtc-internals shows the ACTUAL decoder the game stream uses
+// (decoderImplementation: FFmpeg/libvpx = software, ExternalDecoder = GPU).
+function openDiagWindows() {
+  for (const url of ['chrome://webrtc-internals', 'chrome://gpu']) {
+    const w = new BrowserWindow({ width: 1100, height: 800, title: url });
+    w.loadURL(url);
+  }
 }
 
 let quitting = false;

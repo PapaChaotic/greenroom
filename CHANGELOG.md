@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.10.4 (2026-07-09)
+
+### Added
+- **`--diag` flag**: run `GreenRoom.AppImage --diag` while the app is open
+  to pop Chromium's diagnostic pages (chrome://webrtc-internals and
+  chrome://gpu). webrtc-internals shows the *actual* decoder the game
+  stream is using — the ground truth for hardware-decode debugging.
+
 ## 0.10.3 (2026-07-09)
 
 ### Fixed
