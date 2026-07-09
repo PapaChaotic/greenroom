@@ -16,7 +16,12 @@ const DEFAULTS = {
   closeToTray: true,
   hudPinned: false, // pinned HUD ignores click-out dismissal
   hudHidesApp: true, // summoning the HUD sends the main window to the tray
+  // Cloud-gaming stream bitrate ceiling in Mbps (0 = Xbox's default profile,
+  // which is starved for unknown browsers). The server still adapts down.
+  streamBitrateMbps: 25,
 };
+
+const VALID_BITRATES = new Set([0, 15, 25, 40]);
 
 const VALID_SCALES = new Set(['auto', 1, 1.25, 1.5]);
 // Electron accelerator: modifiers + key code, e.g. "Control+Shift+M".
@@ -47,6 +52,8 @@ function sanitize(raw) {
   if (typeof raw.closeToTray === 'boolean') out.closeToTray = raw.closeToTray;
   if (typeof raw.hudPinned === 'boolean') out.hudPinned = raw.hudPinned;
   if (typeof raw.hudHidesApp === 'boolean') out.hudHidesApp = raw.hudHidesApp;
+  if (VALID_BITRATES.has(raw.streamBitrateMbps))
+    out.streamBitrateMbps = raw.streamBitrateMbps;
   return out;
 }
 

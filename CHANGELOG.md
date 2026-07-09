@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.9.2 (2026-07-09)
+
+### Added
+- **Cloud gaming stream quality setting.** Xbox assigns unknown browsers a
+  starved bitrate profile (we measured 1440p being fed just 4 Mbps — hence
+  the blur). GreenRoom now advertises a higher bandwidth ceiling in the
+  WebRTC negotiation, configurable in Settings: Xbox default / 15 / 25
+  (default) / 40 Mbps. The stream still adapts down on weak connections;
+  this only lifts the cap. Takes effect on the next game launch.
+
 ## Unreleased
 
 ### Fixed

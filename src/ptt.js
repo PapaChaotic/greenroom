@@ -1,19 +1,24 @@
-// Push-to-talk / mic toggle + party audio sensing.
+// Push-to-talk / mic toggle + party audio sensing + stream quality.
 //
 // We wrap navigator.mediaDevices.getUserMedia in the Xbox page so every audio
 // track it captures is registered with us; muting flips `track.enabled` at
 // the source — the page receives pure silence no matter what its UI does.
 //
-// We also wrap RTCPeerConnection to run inbound (party) audio through an
-// AnalyserNode, giving the HUD a "party audio activity" level without ever
-// touching Microsoft's obfuscated UI internals.
+// We also wrap RTCPeerConnection twice over:
+//  - inbound party audio runs through an AnalyserNode for the HUD light
+//  - the SDP answer advertises a higher bandwidth cap (b=AS/b=TIAS) on video
+//    sections, because xCloud assigns unknown browsers a starved bitrate
+//    profile (~4-6 Mbps even at 1440p). The server still adapts DOWN on a
+//    weak network — this only raises the ceiling.
+const config = require('./config');
+
 let xboxContents = null;
 let muted = false;
 const listeners = new Set();
 
 const INJECT = String.raw`(() => {
   if (window.__grMic) return;
-  const state = { tracks: new Set(), muted: __GR_MUTED__, remote: 0 };
+  const state = { tracks: new Set(), muted: __GR_MUTED__, remote: 0, kbps: __GR_KBPS__ };
   window.__grMic = {
     setMuted(m) {
       state.muted = !!m;
@@ -21,8 +26,25 @@ const INJECT = String.raw`(() => {
       return state.muted;
     },
     isMuted: () => state.muted,
+    // Applies to streams negotiated from now on (i.e. the next game launch).
+    setKbps(k) { state.kbps = k | 0; },
     // Peak inbound level since last read (decays so the light goes out).
     remoteLevel() { const v = state.remote; state.remote *= 0.5; return v; },
+  };
+  // Advertise a higher receive-bandwidth cap on video m-sections.
+  const setVideoBitrate = (sdp, kbps) => {
+    const out = [];
+    let inVideo = false;
+    for (const line of sdp.split('\r\n')) {
+      if (line.startsWith('m=')) inVideo = line.startsWith('m=video');
+      if (inVideo && (line.startsWith('b=AS:') || line.startsWith('b=TIAS:'))) continue;
+      out.push(line);
+      if (inVideo && line.startsWith('c=')) {
+        out.push('b=AS:' + kbps);
+        out.push('b=TIAS:' + kbps * 1000);
+      }
+    }
+    return out.join('\r\n');
   };
   const md = navigator.mediaDevices;
   const orig = md.getUserMedia.bind(md);
@@ -76,13 +98,41 @@ const INJECT = String.raw`(() => {
     };
     window.RTCPeerConnection.prototype = RTC.prototype;
     Object.setPrototypeOf(window.RTCPeerConnection, RTC);
+
+    const origSLD = RTC.prototype.setLocalDescription;
+    RTC.prototype.setLocalDescription = function (desc, ...rest) {
+      try {
+        if (state.kbps > 0 && desc && desc.sdp && desc.sdp.includes('m=video')) {
+          desc = { type: desc.type, sdp: setVideoBitrate(desc.sdp, state.kbps) };
+        }
+      } catch {}
+      return origSLD.call(this, desc, ...rest);
+    };
   }
 })();`;
 
+const bitrateKbps = () => (config.get().streamBitrateMbps | 0) * 1000;
+
 function inject(contents) {
   return contents
-    .executeJavaScript(INJECT.replace('__GR_MUTED__', String(muted)))
+    .executeJavaScript(
+      INJECT.replace('__GR_MUTED__', String(muted)).replace(
+        '__GR_KBPS__',
+        String(bitrateKbps())
+      )
+    )
     .catch(() => {});
+}
+
+// Called when the setting changes; affects the next stream negotiation.
+function applyBitrate() {
+  if (xboxContents && !xboxContents.isDestroyed()) {
+    xboxContents
+      .executeJavaScript(
+        `window.__grMic && window.__grMic.setKbps(${bitrateKbps()})`
+      )
+      .catch(() => {});
+  }
 }
 
 // Called from main.js when the Xbox webview's webContents appears.
@@ -134,4 +184,12 @@ const toggle = () => setMuted(!muted);
 const isMuted = () => muted;
 const onChange = (cb) => listeners.add(cb);
 
-module.exports = { attach, setMuted, toggle, isMuted, onChange, getStatus };
+module.exports = {
+  attach,
+  setMuted,
+  toggle,
+  isMuted,
+  onChange,
+  getStatus,
+  applyBitrate,
+};

@@ -20,6 +20,7 @@ function render() {
   $('hk-mic').value = settings.hotkeys.toggleMic || '';
   $('hk-gamebar').value = settings.hotkeys.gameBar || '';
   $('ui-scale').value = String(settings.uiScale);
+  $('stream-bitrate').value = String(settings.streamBitrateMbps);
   $('close-tray').checked = settings.closeToTray;
   $('hud-hides-app').checked = settings.hudHidesApp;
   $('check-updates').checked = settings.checkUpdates;
@@ -79,6 +80,9 @@ $('ui-scale').addEventListener('change', (e) => {
   const v = e.target.value;
   save({ uiScale: v === 'auto' ? 'auto' : Number(v) });
 });
+$('stream-bitrate').addEventListener('change', (e) =>
+  save({ streamBitrateMbps: Number(e.target.value) })
+);
 $('close-tray').addEventListener('change', (e) =>
   save({ closeToTray: e.target.checked })
 );

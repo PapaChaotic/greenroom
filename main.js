@@ -92,6 +92,7 @@ function registerIpc() {
     applyHotkeys();
     tray.refresh(next);
     windows.applyScale(next, xboxContents);
+    ptt.applyBitrate();
     return next;
   });
   ipcMain.handle('settings:testAccelerator', (e, accel) =>
