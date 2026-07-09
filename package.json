@@ -70,7 +70,7 @@
       "provider": "github",
       "owner": "PapaChaotic",
       "repo": "greenroom",
-      "releaseType": "prerelease"
+      "releaseType": "draft"
     }
   }
 }

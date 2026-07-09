@@ -25,7 +25,23 @@ jobs:
         run: sudo sysctl -q -w kernel.apparmor_restrict_unprivileged_userns=0
       - name: Smoke test
         run: xvfb-run --auto-servernum npm run smoke
-      - name: Build AppImage, deb, rpm and publish as prerelease
+      - name: Build AppImage, deb, rpm and upload to a DRAFT release
         run: npx electron-builder --linux --publish always
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Publish only after every asset (including latest-linux.yml) is up, so
+      # in-app update checks never catch a half-uploaded release.
+      - name: Flip the draft live as a prerelease
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const tag = context.ref.replace('refs/tags/', '');
+            const { data: releases } = await github.rest.repos.listReleases({
+              owner: context.repo.owner, repo: context.repo.repo,
+            });
+            const draft = releases.find(r => r.draft && r.tag_name === tag);
+            if (!draft) throw new Error(`no draft release found for ${tag}`);
+            await github.rest.repos.updateRelease({
+              owner: context.repo.owner, repo: context.repo.repo,
+              release_id: draft.id, draft: false, prerelease: true,
+            });

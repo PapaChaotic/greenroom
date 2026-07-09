@@ -71,10 +71,15 @@ async function check({ manual = false } = {}) {
   } catch (err) {
     console.error('update check failed:', err.message);
     if (manual) {
+      // err.message can be a multi-page HTTP dump; keep the human part.
+      const reason = String(err.message).split('\n')[0].slice(0, 200);
       dialog.showMessageBox(getWindow(), {
         type: 'warning',
         message: 'Update check failed.',
-        detail: `${err.message}\n\nYou can check manually at:\n${releasesUrl()}`,
+        detail:
+          `${reason}\n\n` +
+          'If a release was published moments ago it may still be uploading — ' +
+          `try again in a few minutes, or check manually at:\n${releasesUrl()}`,
       });
     }
   } finally {
