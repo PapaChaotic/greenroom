@@ -28,13 +28,58 @@ if (config.get().videoDecode !== 'software') {
     'AcceleratedVideoDecodeLinuxGL',
     'VaapiIgnoreDriverChecks'
   );
-  // On NVIDIA, libva doesn't reliably pick the VA-API shim on its own —
-  // the GPU process needs to be told which driver to load.
-  if (fs.existsSync('/proc/driver/nvidia/version')) {
-    process.env.LIBVA_DRIVER_NAME ||= 'nvidia';
-  }
 }
 app.commandLine.appendSwitch('enable-features', enableFeatures.join(','));
+
+// NVIDIA hardware decode needs LIBVA_DRIVER_NAME in the environment BEFORE
+// Chromium forks its zygote — earlier than any of this JavaScript runs, so
+// setting process.env here never reaches the GPU process. Respawn once with
+// an EXPLICIT env (app.relaunch() does not carry runtime env changes — that
+// way lies an infinite loop). Guarded by GR_VAAPI_RELAUNCH; skipped in smoke
+// tests and when the user exported the variable themselves.
+const bootLog = (msg) => {
+  try {
+    const f = require('path').join(app.getPath('userData'), 'boot.log');
+    try {
+      if (fs.statSync(f).size > 65536) fs.unlinkSync(f); // simple rotation
+    } catch {}
+    fs.appendFileSync(
+      f,
+      `${new Date().toISOString()} pid=${process.pid} ${msg}\n`,
+      { mode: 0o600 }
+    );
+  } catch {}
+};
+bootLog(
+  `boot decode=${config.get().videoDecode} nvidia=${fs.existsSync('/proc/driver/nvidia/version')} ` +
+    `libva=${process.env.LIBVA_DRIVER_NAME || 'unset'} relaunch=${process.env.GR_VAAPI_RELAUNCH || 'unset'} ` +
+    `smoke=${process.env.GR_SMOKE || 'unset'} appimage=${!!process.env.APPIMAGE}`
+);
+
+if (
+  config.get().videoDecode !== 'software' &&
+  fs.existsSync('/proc/driver/nvidia/version') &&
+  !process.env.LIBVA_DRIVER_NAME &&
+  process.env.GR_VAAPI_RELAUNCH !== '1' &&
+  process.env.GR_SMOKE !== '1'
+) {
+  bootLog('respawning with LIBVA_DRIVER_NAME=nvidia');
+  const { spawn } = require('child_process');
+  // Relaunch the AppImage itself when packaged (the /tmp mount dies with
+  // this process); the electron binary + args in dev.
+  const exe = process.env.APPIMAGE || process.execPath;
+  const args = process.env.APPIMAGE ? [] : process.argv.slice(1);
+  spawn(exe, args, {
+    detached: true,
+    stdio: 'ignore',
+    env: {
+      ...process.env,
+      LIBVA_DRIVER_NAME: 'nvidia',
+      GR_VAAPI_RELAUNCH: '1',
+    },
+  }).unref();
+  app.exit(0);
+}
 
 // Chromium's Vulkan path is incompatible with native Wayland and aborts the
 // whole process under heavy GPU load (cloud-gaming video decode). Chromium

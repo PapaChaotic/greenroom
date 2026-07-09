@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.10.2 (2026-07-09)
+
+### Fixed
+- **NVIDIA hardware decode, attempt two — the driver env var is now set at
+  process birth.** Chromium's child processes inherit the environment from
+  before any app code runs, so 0.10.1's runtime fix never took effect. On
+  NVIDIA systems the app now respawns itself once at startup with
+  `LIBVA_DRIVER_NAME=nvidia` in the real environment (instant, loop-guarded,
+  skipped if you exported the variable yourself). A small `boot.log` in the
+  config directory records the decision for debugging.
+
 ## 0.10.1 (2026-07-09)
 
 ### Fixed
