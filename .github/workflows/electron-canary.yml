@@ -27,6 +27,8 @@ jobs:
         run: |
           npm install --no-save electron@latest
           echo "version=$(node -p "require('electron/package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Allow Electron sandbox (Ubuntu 24.04 restricts unprivileged userns)
+        run: sudo sysctl -q -w kernel.apparmor_restrict_unprivileged_userns=0
       - name: Smoke test against latest Electron
         id: smoke
         run: xvfb-run --auto-servernum npm run smoke
