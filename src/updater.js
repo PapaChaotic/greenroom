@@ -12,10 +12,28 @@ let getWindow = () => null;
 let repoUrl = null;
 let checking = false;
 
+// Transient failures (release mid-upload, flaky network, GitHub hiccup)
+// self-heal: retry a few times, spaced out, then give up until the next
+// scheduled check.
+const RETRY_DELAY_MS = 10 * 60 * 1000;
+const MAX_RETRIES = 3;
+let retries = 0;
+let retryTimer = null;
+
 const isAppImage = () => !!process.env.APPIMAGE;
 
 function releasesUrl() {
   return `${repoUrl}/releases/latest`;
+}
+
+function scheduleRetry() {
+  if (retries >= MAX_RETRIES || retryTimer) return false;
+  retries += 1;
+  retryTimer = setTimeout(() => {
+    retryTimer = null;
+    check();
+  }, RETRY_DELAY_MS);
+  return true;
 }
 
 async function promptAndApply(info) {
@@ -32,7 +50,23 @@ async function promptAndApply(info) {
       defaultId: 0,
       cancelId: 1,
     });
-    if (response === 0) await autoUpdater.downloadUpdate();
+    if (response === 0) {
+      try {
+        await autoUpdater.downloadUpdate();
+      } catch (err) {
+        console.error('update download failed:', err.message);
+        const willRetry = scheduleRetry();
+        dialog.showMessageBox(getWindow(), {
+          type: 'warning',
+          message: 'The update download was interrupted.',
+          detail: willRetry
+            ? "No harm done — you're still on the current version. GreenRoom " +
+              'will quietly retry in about 10 minutes and ask again.'
+            : "No harm done — you're still on the current version. " +
+              `You can also grab it manually at:\n${releasesUrl()}`,
+        });
+      }
+    }
   } else {
     const { response } = await dialog.showMessageBox(win, {
       type: 'info',
@@ -61,6 +95,7 @@ async function check({ manual = false } = {}) {
   checking = true;
   try {
     const result = await autoUpdater.checkForUpdates();
+    retries = 0; // healthy again — future failures get a fresh retry budget
     // An available update is handled by the 'update-available' event.
     if (manual && result?.isUpdateAvailable === false) {
       dialog.showMessageBox(getWindow(), {
@@ -70,16 +105,23 @@ async function check({ manual = false } = {}) {
     }
   } catch (err) {
     console.error('update check failed:', err.message);
+    // Background checks retry silently; the user only ever hears about a
+    // failure they triggered themselves.
+    const willRetry = scheduleRetry();
     if (manual) {
       // err.message can be a multi-page HTTP dump; keep the human part.
       const reason = String(err.message).split('\n')[0].slice(0, 200);
       dialog.showMessageBox(getWindow(), {
         type: 'warning',
-        message: 'Update check failed.',
+        message: "Couldn't check for updates right now.",
         detail:
           `${reason}\n\n` +
-          'If a release was published moments ago it may still be uploading — ' +
-          `try again in a few minutes, or check manually at:\n${releasesUrl()}`,
+          'If a release went out moments ago its files may still be ' +
+          'uploading. ' +
+          (willRetry
+            ? 'GreenRoom will retry on its own in about 10 minutes — no ' +
+              'action needed.'
+            : `You can check manually at:\n${releasesUrl()}`),
       });
     }
   } finally {

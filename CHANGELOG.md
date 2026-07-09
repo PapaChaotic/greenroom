@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.9.0-beta.6 (2026-07-09)
+
+### Fixed
+- **Update checks are now self-healing.** If a check or download fails
+  (release still uploading, flaky network), GreenRoom quietly retries up to
+  3 times, 10 minutes apart. Manual checks explain this in plain words
+  instead of dumping HTTP headers.
+- Releases are now published atomically (uploaded as a draft, flipped live
+  only when complete), so an update check can never catch a half-uploaded
+  release again.
+
 ## 0.9.0-beta.5 (2026-07-09)
 
 ### Added
