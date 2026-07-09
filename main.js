@@ -32,7 +32,7 @@ const actions = {
       win.webContents.send('mic:state', muted);
     }
   },
-  gameBar: () => windows.toggleGameBar(),
+  gameBar: () => windows.toggleOverlay(),
 };
 
 function applyHotkeys() {
@@ -69,7 +69,7 @@ function registerIpc() {
     settings: config.get(),
     version: app.getVersion(),
     electron: process.versions.electron,
-    gameBar: windows.isGameBar(),
+    overlay: windows.isOverlay(),
   }));
   ipcMain.handle('settings:set', (e, patch) => {
     if (!fromShell(e)) return config.get();
@@ -107,6 +107,22 @@ app.on('web-contents-created', (_event, contents) => {
 
   // In-app hotkey fallback works on every window, even without the portal.
   hotkeys.attachFallback(contents, config.get, actions);
+
+  // Esc dismisses the Game Bar overlay, wherever focus sits (shell or webview).
+  contents.on('before-input-event', (event, input) => {
+    if (
+      windows.isOverlay() &&
+      input.type === 'keyDown' &&
+      input.key === 'Escape' &&
+      !input.control &&
+      !input.shift &&
+      !input.alt &&
+      !input.meta
+    ) {
+      event.preventDefault();
+      windows.exitOverlay();
+    }
+  });
 });
 
 // --- Lifecycle ---------------------------------------------------------------

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.9.0-beta.2 (2026-07-09)
+
+### Changed
+- **Game Bar view is now a true overlay.** The hotkey (`Ctrl+Shift+G`)
+  summons a pinned panel over whatever you're doing — even while GreenRoom
+  sits in the tray. **Esc or clicking away dismisses it**; the party keeps
+  running in the background. Opening the app normally (tray → Show GreenRoom)
+  restores your regular window size.
+
 ## 0.9.0-beta.1 — first public beta (2026-07-09)
 
 ### Features

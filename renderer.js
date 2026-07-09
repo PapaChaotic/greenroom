@@ -38,9 +38,9 @@ window.greenroom.getMic().then(renderMic);
 document.getElementById('settings-btn').onclick = () =>
   window.greenroom.openSettings();
 
-// --- Compact "Game Bar" view ---
-window.greenroom.onCompact((compact) => {
-  document.body.classList.toggle('compact', compact);
+// --- Game Bar overlay ---
+window.greenroom.onOverlay((overlay) => {
+  document.body.classList.toggle('overlay', overlay);
 });
 
 // --- Hotkey status (Wayland fallback notice) ---

@@ -137,15 +137,28 @@ body,
   color: #fff;
 }
 
-/* ---- Compact "Game Bar" view: hide chrome the small panel doesn't need ---- */
-body.compact .app-name,
-body.compact .beta,
-body.compact .tb-nav {
+/* ---- Game Bar overlay: hide chrome the pinned panel doesn't need ---- */
+body.overlay .app-name,
+body.overlay .beta,
+body.overlay .tb-nav {
   display: none;
 }
 
-body.compact .wc {
+body.overlay .wc {
   width: 34px;
+}
+
+#overlay-hint {
+  display: none;
+  align-self: center;
+  font-size: 10px;
+  color: var(--text-dim);
+  padding-right: 6px;
+  white-space: nowrap;
+}
+
+body.overlay #overlay-hint {
+  display: inline;
 }
 
 /* ---- Webview ---- */

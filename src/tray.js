@@ -19,7 +19,7 @@ function rebuildMenu(config) {
         click: actions.toggleMic,
       },
       {
-        label: 'Game Bar view',
+        label: 'Game Bar overlay',
         sublabel: hk.gameBar || undefined,
         click: actions.toggleGameBar,
       },

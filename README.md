@@ -16,8 +16,8 @@ can't give you.
 ## Features
 
 - 🎙 **Party voice chat** — mic permission is pre-scoped to xbox.com; voice just works
-- ⌨️ **Customizable hotkeys** — mic toggle (push-to-talk style) and Game Bar view, rebindable in Settings
-- 🪟 **Game Bar view** — hotkey flips the app into a compact, always-on-top panel while you game
+- ⌨️ **Customizable hotkeys** — mic toggle (push-to-talk style) and Game Bar overlay, rebindable in Settings
+- 🪟 **Game Bar overlay** — hotkey summons a pinned party panel over your game (even from the tray); Esc or clicking away dismisses it while the party keeps running
 - 🔕 **System tray** — closing the window keeps your party running; mute from the tray
 - 🖥 **Steam Deck ready** — auto-scales 125% on Deck-size screens (manual 100–150% override)
 - 🔄 **Safe updates** — the app checks GitHub releases, asks you, then updates and restarts (AppImage) or opens the download page (deb/rpm). Nothing installs without your consent
@@ -42,7 +42,7 @@ Full instructions, including **Steam Deck setup**, in [docs/INSTALL.md](docs/INS
 | Action | Default | Notes |
 |---|---|---|
 | Mic toggle | `Ctrl+Shift+M` | Works globally on X11/Deck; focus-only on Wayland desktops without the GlobalShortcuts portal |
-| Game Bar view | `Ctrl+Shift+G` | Compact always-on-top panel |
+| Game Bar overlay | `Ctrl+Shift+G` | Summons the pinned party panel; Esc or click-away dismisses |
 
 Rebind both in **Settings** (gear icon or tray menu).
 

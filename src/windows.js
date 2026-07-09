@@ -3,8 +3,8 @@ const path = require('path');
 
 let main = null;
 let settings = null;
-let gameBar = false;
-let savedBounds = null;
+let overlay = false;
+let savedNormal = null; // window geometry to restore after overlay mode
 
 // Steam Deck (and similar handhelds) report a 1280x800 panel; bump the UI.
 function autoScale() {
@@ -56,31 +56,64 @@ function createMain(config, { onClose }) {
 
   main.on('close', (event) => onClose(event, main));
   main.on('closed', () => (main = null));
+
+  // Click-out dismissal: losing focus to anything that isn't one of our own
+  // windows (settings, dialogs) closes the overlay, like Xbox Game Bar.
+  main.on('blur', () => {
+    if (overlay && !BrowserWindow.getFocusedWindow()) exitOverlay();
+  });
+
   return main;
 }
 
-// Compact always-on-top "Game Bar" view: small pinned panel for mid-game use.
-function toggleGameBar() {
-  if (!main || main.isDestroyed()) return gameBar;
-  gameBar = !gameBar;
-  if (gameBar) {
-    savedBounds = main.getBounds();
+// --- Game Bar overlay -------------------------------------------------------
+// The hotkey SUMMONS the app as a pinned panel over whatever you're doing —
+// even while GreenRoom sits hidden in the tray. Esc or clicking away
+// dismisses it back to the tray; the party keeps running either way.
+
+function enterOverlay() {
+  if (!main || main.isDestroyed()) return;
+  if (!overlay) {
+    savedNormal = { bounds: main.getBounds(), maximized: main.isMaximized() };
     if (main.isMaximized()) main.unmaximize();
-    const { workArea } = screen.getPrimaryDisplay();
-    main.setAlwaysOnTop(true, 'screen-saver');
-    main.setBounds({
-      x: workArea.x + workArea.width - 440,
-      y: workArea.y + 20,
-      width: 420,
-      height: 640,
-    });
-    main.show();
-  } else {
-    main.setAlwaysOnTop(false);
-    if (savedBounds) main.setBounds(savedBounds);
   }
-  main.webContents.send('ui:compact', gameBar);
-  return gameBar;
+  overlay = true;
+  const { workArea } = screen.getDisplayNearestPoint(
+    screen.getCursorScreenPoint()
+  );
+  const width = 420;
+  const height = Math.min(720, workArea.height - 32);
+  main.setSkipTaskbar(true);
+  main.setAlwaysOnTop(true, 'screen-saver');
+  main.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+  main.setBounds({
+    x: workArea.x + workArea.width - width - 16,
+    y: workArea.y + 16,
+    width,
+    height,
+  });
+  main.show();
+  main.focus();
+  main.webContents.send('ui:overlay', true);
+}
+
+function exitOverlay({ hide = true } = {}) {
+  if (!main || main.isDestroyed() || !overlay) return;
+  overlay = false;
+  main.setAlwaysOnTop(false);
+  main.setVisibleOnAllWorkspaces(false);
+  main.setSkipTaskbar(false);
+  if (savedNormal) {
+    main.setBounds(savedNormal.bounds);
+    if (savedNormal.maximized) main.maximize();
+  }
+  main.webContents.send('ui:overlay', false);
+  if (hide) main.hide();
+}
+
+function toggleOverlay() {
+  if (overlay && main?.isVisible()) exitOverlay();
+  else enterOverlay();
 }
 
 function openSettings() {
@@ -109,22 +142,26 @@ function openSettings() {
   return settings;
 }
 
+// Normal "show the app" path (tray click, second launch): always leaves
+// overlay mode so the user gets their regular window back.
 function show() {
   if (!main || main.isDestroyed()) return;
+  exitOverlay({ hide: false });
   main.show();
   main.focus();
 }
 
 const getMain = () => (main && !main.isDestroyed() ? main : null);
-const isGameBar = () => gameBar;
+const isOverlay = () => overlay;
 
 module.exports = {
   createMain,
-  toggleGameBar,
+  toggleOverlay,
+  exitOverlay,
   openSettings,
   applyScale,
   resolveScale,
   show,
   getMain,
-  isGameBar,
+  isOverlay,
 };
