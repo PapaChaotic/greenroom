@@ -2,7 +2,7 @@
   "name": "greenroom",
   "productName": "GreenRoom",
   "version": "0.10.1",
-  "description": "Unofficial Xbox party chat client for Linux. Not affiliated with or endorsed by Microsoft.",
+  "description": "Unofficial Xbox party chat and Game Pass cloud gaming client for Linux and Steam Deck. Not affiliated with or endorsed by Microsoft.",
   "main": "main.js",
   "author": {
     "name": "Travis Atkinson",
@@ -57,11 +57,11 @@
       ],
       "icon": "assets/icon.png",
       "category": "Network",
-      "synopsis": "Unofficial Xbox party chat client",
+      "synopsis": "Unofficial Xbox party chat + Game Pass cloud gaming client",
       "desktop": {
         "entry": {
           "Name": "GreenRoom (Beta)",
-          "Comment": "Unofficial Xbox party chat — not affiliated with Microsoft",
+          "Comment": "Unofficial Xbox party chat + Game Pass cloud gaming — not affiliated with Microsoft",
           "Categories": "Network;Chat;Game;"
         }
       }

@@ -27,7 +27,7 @@ All boundaries live in [`src/security.js`](src/security.js) for single-point aud
 | Webview attach | `will-attach-webview` strips any preload and forces isolation — no privileged webview can ever attach |
 | IPC | Fixed channel allowlist in the preload; main process validates every sender before acting. The Xbox page cannot reach IPC (no preload, and webview guests fail sender validation) |
 | Popups | `setWindowOpenHandler` denies all popup windows |
-| Page hooks | The mic/party-audio code injected into the Xbox page ([`src/ptt.js`](src/ptt.js)) interpolates only booleans/constants — no user or remote data flows into `executeJavaScript` |
+| Page hooks | The code injected into the Xbox page ([`src/ptt.js`](src/ptt.js)) — mic control, party-audio sensing, stream-bitrate negotiation, audio gain, gamepad presence — interpolates only booleans/our own numeric settings; no user or remote data flows into `executeJavaScript` |
 | Mute integrity | Mute state is re-asserted into the page every 10s, so page scripts can't silently re-enable the mic while the UI shows muted |
 | CLI signals | `--hud` / `--mic` signal the running instance via Electron's single-instance lock, scoped to this user's profile — other local users can't send them |
 

@@ -1,19 +1,28 @@
 # GreenRoom <sub>BETA</sub>
 
-**Unofficial Xbox party chat client for Linux — including Steam Deck.**
+**Play Game Pass and run Xbox party chat on Linux and Steam Deck — one app.**
 
-GreenRoom wraps Microsoft's own **web** party chat (`xbox.com/play`) in a
-focused, Game Bar–style desktop app: sign in with your normal Microsoft
-account, join a party, and talk — with the gaming conveniences a browser tab
-can't give you.
+GreenRoom wraps Microsoft's official web Xbox experience (`xbox.com/play`)
+in a hardened, Game Bar–style desktop app. Sign in with your normal
+Microsoft account and you get **party voice chat** with your Xbox friends
+*and* **Xbox Cloud Gaming** at the maximum quality Microsoft serves — with
+gaming conveniences a browser tab can't give you: push-to-talk hotkeys, a
+pinnable in-game HUD, a system tray that keeps the party alive, and
+hardware-decoded streaming.
 
 > **Honesty first:** GreenRoom is an independent project, **not affiliated
 > with, endorsed by, or sponsored by Microsoft**. Xbox is a trademark of
 > Microsoft Corporation. Under the hood this is Microsoft's official web
-> party chat rendered in a hardened Chromium shell — we don't touch the
-> protocol, your credentials, or your traffic.
+> app rendered in a hardened Chromium shell — we don't touch the protocol,
+> your credentials, or your traffic. An active Game Pass subscription is
+> required for cloud gaming (party chat is free).
 
 ## Screenshots
+
+**Cloud gaming** — Game Pass titles stream right in the app (Forza Horizon,
+controller and all):
+
+![Forza Horizon streaming in GreenRoom](docs/screenshots/cloud-gaming.png)
 
 **The app** — the full Xbox experience in a Game Bar–style shell:
 
@@ -31,15 +40,28 @@ app stays tucked away in the tray:
 
 ## Features
 
+### Gaming
+- 🎮 **Xbox Cloud Gaming** — Game Pass titles stream over WebRTC (no DRM
+  plugin needed), controller and all
+- 🚀 **Unlocked stream quality** — Xbox rations unknown browsers to a blurry
+  ~5 Mbps; GreenRoom negotiates up to Xbox's real ~25 Mbps ceiling
+- 🖥 **Hardware (GPU) video decoding** — smooth high-bitrate streams and the
+  key to 60 fps; CPU fallback available in Settings
+- 🎚 **Quality profiles** — Data saver (weak internet) through Maximum, plus
+  a game-audio boost slider (party voices unaffected)
+- 🎮 **Two-stage controller indicator** — see at a glance whether your pad
+  is plugged in (amber) or live in the game (green)
+
+### Party chat
 - 🎙 **Party voice chat** — mic permission is pre-scoped to xbox.com; voice just works
-- 🎮 **Cloud gaming works too** — Xbox Cloud Gaming streams over WebRTC (no DRM plugin needed), so Game Pass titles play right in the app, controller and all
-- 🎚 **Configurable streaming** — quality profiles from Data saver (weak internet) to Xbox's 25 Mbps maximum, GPU/CPU video decoding toggle, and a game-audio boost slider, so everyone gets a playable setup
 - ⌨️ **Customizable hotkeys** — mic toggle (push-to-talk style) and Game Bar HUD, rebindable in Settings
-- 🪟 **Game Bar HUD** — hotkey summons a small translucent pill of party essentials (mic toggle, party-audio light) over your game; Esc or clicking away dismisses it while the party keeps running
+- 🪟 **Game Bar HUD** — hotkey summons a small translucent pill of party essentials over your game; 📌 pin it, or Esc/click-away to dismiss while the party keeps running
 - 🔕 **System tray** — closing the window keeps your party running; mute from the tray
+
+### Platform
 - 🖥 **Steam Deck ready** — auto-scales 125% on Deck-size screens (manual 100–150% override)
-- 🔄 **Safe updates** — the app checks GitHub releases, asks you, then updates and restarts (AppImage) or opens the download page (deb/rpm). Nothing installs without your consent
-- 🔒 **Security as a feature** — see [SECURITY.md](SECURITY.md); no telemetry, see [PRIVACY.md](PRIVACY.md)
+- 🔄 **Interruption-free updates** — background-found updates wait quietly in the tray; nothing downloads, installs, or restarts without your consent
+- 🔒 **Security as a feature** — sandboxed, fused binaries, audited ([SECURITY.md](SECURITY.md)); zero telemetry ([PRIVACY.md](PRIVACY.md))
 
 ## Install
 
@@ -84,12 +106,12 @@ GreenRoom.AppImage --mic   # toggle your microphone
 
 ## Requirements & known limitations
 
-- An Xbox/Microsoft account. Party chat on the web rolled out via the Xbox
-  Insider program; if the party UI doesn't appear for your account, enroll at
-  [xbox.com insider program](https://www.xbox.com/en-US/xbox-insider-program).
-- **Cloud gaming plays** because Xbox streams gameplay over WebRTC (no DRM
-  plugin required). The app is chat-first: streaming works but hasn't had
-  performance tuning, and long sessions are less battle-tested than voice.
+- An Xbox/Microsoft account; **cloud gaming needs an active Game Pass
+  subscription** (party chat is free). Party chat on the web rolled out via
+  the Xbox Insider program; if the party UI doesn't appear for your account,
+  enroll at [xbox.com insider program](https://www.xbox.com/en-US/xbox-insider-program).
+- Stream quality tops out at **Xbox's own server ceiling (~25 Mbps)** — no
+  client can request more than Microsoft encodes.
 - Mic capture uses your system's PipeWire/PulseAudio; if the mic works in
   Chromium, it works here.
 - **Beta**: expect rough edges — crashes offer a pre-filled GitHub issue

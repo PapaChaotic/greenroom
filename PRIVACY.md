@@ -29,5 +29,7 @@ Short version: **GreenRoom collects nothing and phones home to no one.**
 
 - No analytics, telemetry, tracking, or fingerprinting
 - No third-party services beyond Microsoft (the product) and GitHub (updates/issues)
-- No reading of your chats, messages, or party audio — those render inside
-  Microsoft's web app; GreenRoom is the window frame around it
+- No reading of your chats, messages, party audio, or game streams — those
+  render inside Microsoft's web app; GreenRoom is the window frame around it
+  (the party-activity light and audio boost process audio *levels and
+  volume* locally, never content, and nothing leaves your machine)

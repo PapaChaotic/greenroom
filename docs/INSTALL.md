@@ -66,7 +66,21 @@ Notes:
 2. Party chat lives in the social/friends area of the Xbox interface. If you
    don't see a party option, your account may need
    [Xbox Insider enrollment](https://www.xbox.com/en-US/xbox-insider-program).
-3. Check Settings (gear icon) to customize hotkeys and scale.
+3. **Cloud gaming** (needs Game Pass): pick a title and hit Play. Plug in a
+   controller and **press any button on it** — the titlebar 🎮 turns from
+   amber to green and Xbox's "No controller detected" prompt goes away.
+4. Check Settings (gear icon): stream quality profile, GPU/CPU video
+   decoding, game-audio boost, hotkeys, and UI scale.
+
+### For the best cloud gaming quality
+
+- Leave **stream quality on Maximum** and **video decoding on Hardware**
+  (the defaults).
+- **NVIDIA GPUs** need the VA-API shim for hardware decoding:
+  `sudo dnf install libva-nvidia-driver` (Fedora/Nobara) or
+  `nvidia-vaapi-driver` (Arch/Debian), then restart GreenRoom.
+  AMD/Intel (including Steam Deck) work out of the box.
+- On weak internet, switch to the **Data saver** profile.
 
 ## Uninstall
 
