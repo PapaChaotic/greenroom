@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.9.0-beta.3 (2026-07-09)
+
+### Changed
+- **The Game Bar is now a real HUD.** `Ctrl+Shift+G` summons a small,
+  slightly transparent pill of party essentials — mic toggle, a party-audio
+  activity light, open-app, and dismiss — instead of the full web page.
+  Drag it anywhere; Esc or clicking away hides it. The Xbox page keeps
+  running hidden in the background, so voice never drops.
+- The party-audio light senses inbound voice through WebRTC analysis — no
+  scraping of Microsoft's UI. Per-member "who's talking" is a future item.
+
 ## 0.9.0-beta.2 (2026-07-09)
 
 ### Changed

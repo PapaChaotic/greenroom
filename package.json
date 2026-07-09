@@ -43,6 +43,8 @@
       "styles.css",
       "settings.html",
       "settings.js",
+      "hud.html",
+      "hud.js",
       "src/**/*",
       "assets/**/*"
     ],

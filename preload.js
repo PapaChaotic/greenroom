@@ -14,8 +14,10 @@ contextBridge.exposeInMainWorld('greenroom', {
   getMic: () => ipcRenderer.invoke('mic:get'),
   onMicState: (cb) => ipcRenderer.on('mic:state', (_e, v) => cb(v)),
 
-  // Game Bar overlay + hotkey status
-  onOverlay: (cb) => ipcRenderer.on('ui:overlay', (_e, v) => cb(v)),
+  // Game Bar HUD + hotkey status
+  hudHide: () => ipcRenderer.send('hud:hide'),
+  hudOpenApp: () => ipcRenderer.send('hud:open'),
+  onHudStatus: (cb) => ipcRenderer.on('hud:status', (_e, v) => cb(v)),
   onHotkeyStatus: (cb) => ipcRenderer.on('hotkeys:status', (_e, v) => cb(v)),
 
   // settings

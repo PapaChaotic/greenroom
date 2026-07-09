@@ -137,30 +137,6 @@ body,
   color: #fff;
 }
 
-/* ---- Game Bar overlay: hide chrome the pinned panel doesn't need ---- */
-body.overlay .app-name,
-body.overlay .beta,
-body.overlay .tb-nav {
-  display: none;
-}
-
-body.overlay .wc {
-  width: 34px;
-}
-
-#overlay-hint {
-  display: none;
-  align-self: center;
-  font-size: 10px;
-  color: var(--text-dim);
-  padding-right: 6px;
-  white-space: nowrap;
-}
-
-body.overlay #overlay-hint {
-  display: inline;
-}
-
 /* ---- Webview ---- */
 #view {
   flex: 1;

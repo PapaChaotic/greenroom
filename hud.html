@@ -1,0 +1,61 @@
+<meta charset="utf-8" />
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'self'; style-src 'self' 'unsafe-inline';" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: transparent; overflow: hidden; }
+  #pill {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 56px;
+    padding: 0 10px;
+    background: rgba(11, 15, 11, 0.78);
+    border: 1px solid rgba(22, 198, 12, 0.35);
+    border-radius: 16px;
+    -webkit-app-region: drag; /* grab anywhere to reposition */
+    user-select: none;
+    font-family: "Segoe UI", system-ui, sans-serif;
+  }
+  .logo {
+    width: 26px; height: 26px;
+    display: grid; place-items: center;
+    background: rgba(16, 124, 16, 0.9);
+    color: #fff; border-radius: 8px;
+    font-size: 11px; font-weight: 700;
+    margin-right: 2px;
+  }
+  button {
+    -webkit-app-region: no-drag;
+    width: 38px; height: 38px;
+    border: none; border-radius: 10px;
+    background: transparent;
+    color: #cfe0cf; font-size: 17px;
+    cursor: pointer;
+  }
+  button:hover { background: rgba(255, 255, 255, 0.12); }
+  #mic.muted { color: #ff6b5e; }
+  /* Party audio activity light */
+  #activity {
+    -webkit-app-region: no-drag;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: rgba(143, 160, 143, 0.4);
+    margin: 0 6px;
+    transition: background 0.15s ease, box-shadow 0.15s ease;
+  }
+  #activity.live {
+    background: #16c60c;
+    box-shadow: 0 0 8px #16c60c;
+  }
+</style>
+
+<div id="pill" title="GreenRoom — drag to move">
+  <span class="logo">GR</span>
+  <button id="mic" title="Toggle microphone">🎙</button>
+  <span id="activity" title="Party audio activity"></span>
+  <button id="open" title="Open GreenRoom">⌐</button>
+  <button id="hide" title="Hide (Esc)">✕</button>
+</div>
+
+<script src="hud.js"></script>

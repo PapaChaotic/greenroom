@@ -32,7 +32,7 @@ const actions = {
       win.webContents.send('mic:state', muted);
     }
   },
-  gameBar: () => windows.toggleOverlay(),
+  gameBar: () => windows.toggleHud(),
 };
 
 function applyHotkeys() {
@@ -69,7 +69,6 @@ function registerIpc() {
     settings: config.get(),
     version: app.getVersion(),
     electron: process.versions.electron,
-    overlay: windows.isOverlay(),
   }));
   ipcMain.handle('settings:set', (e, patch) => {
     if (!fromShell(e)) return config.get();
@@ -90,6 +89,24 @@ function registerIpc() {
   ipcMain.on('updates:check', (e) => {
     if (fromShell(e)) updaterApi.check({ manual: true });
   });
+  ipcMain.on('hud:hide', (e) => {
+    if (fromShell(e)) windows.hideHud();
+  });
+  ipcMain.on('hud:open', (e) => {
+    if (fromShell(e)) {
+      windows.hideHud();
+      windows.show();
+    }
+  });
+}
+
+// Stream mic + party-audio status to the HUD while it's visible.
+function startHudFeed() {
+  setInterval(async () => {
+    if (!windows.isHudVisible()) return;
+    const status = await ptt.getStatus();
+    windows.getHud()?.webContents.send('hud:status', status);
+  }, 300);
 }
 
 // --- Per-webContents hardening + feature wiring -----------------------------
@@ -107,22 +124,6 @@ app.on('web-contents-created', (_event, contents) => {
 
   // In-app hotkey fallback works on every window, even without the portal.
   hotkeys.attachFallback(contents, config.get, actions);
-
-  // Esc dismisses the Game Bar overlay, wherever focus sits (shell or webview).
-  contents.on('before-input-event', (event, input) => {
-    if (
-      windows.isOverlay() &&
-      input.type === 'keyDown' &&
-      input.key === 'Escape' &&
-      !input.control &&
-      !input.shift &&
-      !input.alt &&
-      !input.meta
-    ) {
-      event.preventDefault();
-      windows.exitOverlay();
-    }
-  });
 });
 
 // --- Lifecycle ---------------------------------------------------------------
@@ -154,6 +155,7 @@ app.whenReady().then(() => {
   });
 
   applyHotkeys();
+  startHudFeed();
   ptt.onChange((muted) => tray.setMicState(muted, config.get()));
 
   updaterApi = updater.init({

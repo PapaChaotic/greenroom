@@ -3,8 +3,7 @@ const path = require('path');
 
 let main = null;
 let settings = null;
-let overlay = false;
-let savedNormal = null; // window geometry to restore after overlay mode
+let hud = null;
 
 // Steam Deck (and similar handhelds) report a 1280x800 panel; bump the UI.
 function autoScale() {
@@ -56,65 +55,66 @@ function createMain(config, { onClose }) {
 
   main.on('close', (event) => onClose(event, main));
   main.on('closed', () => (main = null));
-
-  // Click-out dismissal: losing focus to anything that isn't one of our own
-  // windows (settings, dialogs) closes the overlay, like Xbox Game Bar.
-  main.on('blur', () => {
-    if (overlay && !BrowserWindow.getFocusedWindow()) exitOverlay();
-  });
-
   return main;
 }
 
-// --- Game Bar overlay -------------------------------------------------------
-// The hotkey SUMMONS the app as a pinned panel over whatever you're doing —
-// even while GreenRoom sits hidden in the tray. Esc or clicking away
-// dismisses it back to the tray; the party keeps running either way.
+// --- Game Bar HUD ------------------------------------------------------------
+// A small, slightly transparent pill of party essentials (mic toggle, party
+// audio light, open app) that the hotkey summons over your game. Esc or
+// clicking away hides it; the party keeps running in the background.
 
-function enterOverlay() {
-  if (!main || main.isDestroyed()) return;
-  if (!overlay) {
-    savedNormal = { bounds: main.getBounds(), maximized: main.isMaximized() };
-    if (main.isMaximized()) main.unmaximize();
-  }
-  overlay = true;
+function createHud() {
+  hud = new BrowserWindow({
+    width: 252,
+    height: 64,
+    frame: false,
+    transparent: true,
+    backgroundColor: '#00000000',
+    resizable: false,
+    skipTaskbar: true,
+    show: false,
+    title: 'GreenRoom HUD',
+    webPreferences: {
+      preload: path.join(__dirname, '..', 'preload.js'),
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: true,
+    },
+  });
+  hud.loadFile('hud.html');
+  hud.webContents.on('will-navigate', (e) => e.preventDefault());
+  hud.setAlwaysOnTop(true, 'screen-saver');
+  hud.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+  // Click-out dismissal (focus moving to one of our own windows doesn't count).
+  hud.on('blur', () => {
+    if (hud?.isVisible() && !BrowserWindow.getFocusedWindow()) hideHud();
+  });
+  hud.on('closed', () => (hud = null));
+  return hud;
+}
+
+function showHud() {
+  if (!hud || hud.isDestroyed()) createHud();
   const { workArea } = screen.getDisplayNearestPoint(
     screen.getCursorScreenPoint()
   );
-  const width = 420;
-  const height = Math.min(720, workArea.height - 32);
-  main.setSkipTaskbar(true);
-  main.setAlwaysOnTop(true, 'screen-saver');
-  main.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
-  main.setBounds({
-    x: workArea.x + workArea.width - width - 16,
-    y: workArea.y + 16,
-    width,
-    height,
-  });
-  main.show();
-  main.focus();
-  main.webContents.send('ui:overlay', true);
+  hud.setPosition(workArea.x + workArea.width - 252 - 16, workArea.y + 16);
+  hud.show();
+  hud.focus();
 }
 
-function exitOverlay({ hide = true } = {}) {
-  if (!main || main.isDestroyed() || !overlay) return;
-  overlay = false;
-  main.setAlwaysOnTop(false);
-  main.setVisibleOnAllWorkspaces(false);
-  main.setSkipTaskbar(false);
-  if (savedNormal) {
-    main.setBounds(savedNormal.bounds);
-    if (savedNormal.maximized) main.maximize();
-  }
-  main.webContents.send('ui:overlay', false);
-  if (hide) main.hide();
+function hideHud() {
+  if (hud && !hud.isDestroyed()) hud.hide();
 }
 
-function toggleOverlay() {
-  if (overlay && main?.isVisible()) exitOverlay();
-  else enterOverlay();
+function toggleHud() {
+  if (hud && !hud.isDestroyed() && hud.isVisible()) hideHud();
+  else showHud();
 }
+
+const isHudVisible = () =>
+  !!(hud && !hud.isDestroyed() && hud.isVisible());
+const getHud = () => (hud && !hud.isDestroyed() ? hud : null);
 
 function openSettings() {
   if (settings && !settings.isDestroyed()) {
@@ -142,26 +142,23 @@ function openSettings() {
   return settings;
 }
 
-// Normal "show the app" path (tray click, second launch): always leaves
-// overlay mode so the user gets their regular window back.
 function show() {
   if (!main || main.isDestroyed()) return;
-  exitOverlay({ hide: false });
   main.show();
   main.focus();
 }
 
 const getMain = () => (main && !main.isDestroyed() ? main : null);
-const isOverlay = () => overlay;
 
 module.exports = {
   createMain,
-  toggleOverlay,
-  exitOverlay,
+  toggleHud,
+  hideHud,
+  isHudVisible,
+  getHud,
   openSettings,
   applyScale,
   resolveScale,
   show,
   getMain,
-  isOverlay,
 };
