@@ -33,6 +33,7 @@ app stays tucked away in the tray:
 
 - 🎙 **Party voice chat** — mic permission is pre-scoped to xbox.com; voice just works
 - 🎮 **Cloud gaming works too** — Xbox Cloud Gaming streams over WebRTC (no DRM plugin needed), so Game Pass titles play right in the app, controller and all
+- 🎚 **Configurable streaming** — quality profiles from Data saver (weak internet) to Xbox's 25 Mbps maximum, GPU/CPU video decoding toggle, and a game-audio boost slider, so everyone gets a playable setup
 - ⌨️ **Customizable hotkeys** — mic toggle (push-to-talk style) and Game Bar HUD, rebindable in Settings
 - 🪟 **Game Bar HUD** — hotkey summons a small translucent pill of party essentials (mic toggle, party-audio light) over your game; Esc or clicking away dismisses it while the party keeps running
 - 🔕 **System tray** — closing the window keeps your party running; mute from the tray
@@ -93,6 +94,29 @@ GreenRoom.AppImage --mic   # toggle your microphone
   Chromium, it works here.
 - **Beta**: expect rough edges — crashes offer a pre-filled GitHub issue
   (nothing is ever sent automatically).
+
+## FAQ / quirks
+
+**My controller isn't detected until a game starts.** Two separate things:
+browsers only expose gamepads after you *press a button* (privacy rule), and
+Microsoft's home menus mostly ignore controllers until a stream is running.
+Press a button and watch the 🎮 icon in GreenRoom's titlebar light up — that
+means the app sees your controller and it will work in-game, even while the
+Xbox menus ignore it. That part is Microsoft's web UI, not a missing driver.
+
+**The stream is 30 fps — how do I get 60?** Set stream quality to
+**Maximum** and video decoding to **Hardware** (both in Settings), then
+restart. The server only sends 60 fps when the client proves it can decode
+fast enough — software (CPU) decoding usually can't. NVIDIA users must also
+install the VA-API shim: `sudo dnf install libva-nvidia-driver` (Fedora/
+Nobara) or `nvidia-vaapi-driver` (Arch/Debian). AMD and Intel GPUs work out
+of the box.
+
+**The game is quiet.** Settings → *Game audio boost* goes up to 300% (party
+voices are unaffected). Also check GreenRoom's slider in your system mixer.
+
+**Bad internet?** Set stream quality to **Data saver** — lower bitrate,
+usually 30 fps, far fewer hitches.
 
 ## Building from source
 

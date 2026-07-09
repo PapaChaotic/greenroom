@@ -38,6 +38,16 @@ window.greenroom.getMic().then(renderMic);
 document.getElementById('settings-btn').onclick = () =>
   window.greenroom.openSettings();
 
+// --- Controller indicator ---
+const pad = document.getElementById('pad-indicator');
+window.greenroom.onGamepadState((count) => {
+  pad.classList.toggle('connected', count > 0);
+  pad.title =
+    count > 0
+      ? `Controller detected (${count})`
+      : "No controller detected yet — press a button on it. Xbox's menus may ignore it until a game is running.";
+});
+
 // --- Hotkey status (Wayland fallback notice) ---
 const note = document.getElementById('hotkey-note');
 window.greenroom.onHotkeyStatus(({ failed }) => {

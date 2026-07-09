@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.10.0 (2026-07-09)
+
+### Added
+- **GPU/CPU video decoding toggle** (Settings, default: Hardware/GPU).
+  Hardware decode is what unlocks 60 fps streams — the server only sends
+  60 when the client can decode in budget. Software/CPU remains as a
+  compatibility fallback. NVIDIA needs the system VA-API shim
+  (`libva-nvidia-driver`); AMD/Intel work out of the box. Restart to apply.
+- **Data saver stream profile** (~8 Mbps) for weak connections, alongside
+  Balanced / Maximum / Headroom. Profile names now say what they mean.
+- **Game audio boost** slider (100–300%) — boosts the game stream without
+  touching party voices, applies live.
+- **🎮 Controller indicator** in the titlebar: lights up the moment the app
+  sees your gamepad (press any button), so "Xbox's menu ignores my
+  controller until the game starts" reads as what it is — Microsoft's web
+  UI behavior, not a detection failure. FAQ section added to the README.
+
 ## 0.9.4 (2026-07-09)
 
 ### Fixed

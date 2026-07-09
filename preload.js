@@ -21,6 +21,7 @@ contextBridge.exposeInMainWorld('greenroom', {
   onHotkeyStatus: (cb) => ipcRenderer.on('hotkeys:status', (_e, v) => cb(v)),
   onUpdateAvailable: (cb) =>
     ipcRenderer.on('update:available', (_e, v) => cb(v)),
+  onGamepadState: (cb) => ipcRenderer.on('gamepad:state', (_e, v) => cb(v)),
 
   // settings
   openSettings: () => ipcRenderer.send('settings:open'),

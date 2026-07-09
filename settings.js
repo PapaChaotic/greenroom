@@ -21,6 +21,9 @@ function render() {
   $('hk-gamebar').value = settings.hotkeys.gameBar || '';
   $('ui-scale').value = String(settings.uiScale);
   $('stream-bitrate').value = String(settings.streamBitrateMbps);
+  $('video-decode').value = settings.videoDecode;
+  $('game-volume').value = String(settings.gameVolume);
+  $('vol-label').textContent = settings.gameVolume + '%';
   $('close-tray').checked = settings.closeToTray;
   $('hud-hides-app').checked = settings.hudHidesApp;
   $('check-updates').checked = settings.checkUpdates;
@@ -82,6 +85,16 @@ $('ui-scale').addEventListener('change', (e) => {
 });
 $('stream-bitrate').addEventListener('change', (e) =>
   save({ streamBitrateMbps: Number(e.target.value) })
+);
+$('video-decode').addEventListener('change', (e) => {
+  save({ videoDecode: e.target.value });
+  flash('Saved — restart GreenRoom to apply.');
+});
+$('game-volume').addEventListener('input', (e) => {
+  $('vol-label').textContent = e.target.value + '%';
+});
+$('game-volume').addEventListener('change', (e) =>
+  save({ gameVolume: Number(e.target.value) })
 );
 $('close-tray').addEventListener('change', (e) =>
   save({ closeToTray: e.target.checked })

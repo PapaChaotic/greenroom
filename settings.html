@@ -26,15 +26,39 @@
   <div class="field">
     <label for="stream-bitrate">Cloud gaming stream quality</label>
     <select id="stream-bitrate">
-      <option value="0">Xbox default (conservative — can look blurry)</option>
-      <option value="15">Up to 15 Mbps</option>
-      <option value="25">Up to 25 Mbps (recommended — Xbox's real max)</option>
-      <option value="40">Up to 40 Mbps (headroom; Xbox tops out ~25 today)</option>
+      <option value="8">Data saver — for weak internet (lower res, usually 30 fps)</option>
+      <option value="15">Balanced — up to 15 Mbps</option>
+      <option value="25">Maximum — 25 Mbps (recommended; Xbox's real ceiling)</option>
+      <option value="40">Headroom — 40 Mbps (Xbox tops out ~25 today)</option>
     </select>
     <p class="hint">
-      Raises the bitrate ceiling Xbox is allowed to use — the stream still
-      adapts down on a weak connection. Xbox's own servers currently top out
-      around 25 Mbps. Applies to the next game you launch.
+      Sets the bitrate ceiling Xbox may use — the stream still adapts down on
+      a weak connection. Applies to the next game you launch. Smooth 60 fps
+      needs Maximum plus hardware decoding below.
+    </p>
+  </div>
+
+  <div class="field">
+    <label for="video-decode">Video decoding</label>
+    <select id="video-decode">
+      <option value="hardware">Hardware — GPU (recommended, required for 60 fps)</option>
+      <option value="software">Software — CPU (compatibility fallback)</option>
+    </select>
+    <p class="hint">
+      Takes effect after restarting GreenRoom. NVIDIA cards also need the
+      system package <b>libva-nvidia-driver</b> (Nobara/Fedora:
+      <b>sudo dnf install libva-nvidia-driver</b>). Choose Software only if
+      you see graphical glitches.
+    </p>
+  </div>
+
+  <div class="field">
+    <label for="game-volume">Game audio boost: <span id="vol-label">100%</span></label>
+    <input type="range" id="game-volume" min="100" max="300" step="25" />
+    <p class="hint">
+      Boosts the game stream louder than normal (party voices are not
+      affected). Applies immediately. If everything is quiet, also check
+      GreenRoom's volume in your system mixer.
     </p>
   </div>
 

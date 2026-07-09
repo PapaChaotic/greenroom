@@ -19,9 +19,17 @@ const DEFAULTS = {
   // Cloud-gaming stream bitrate ceiling in Mbps (0 = Xbox's default profile,
   // which is starved for unknown browsers). The server still adapts down.
   streamBitrateMbps: 25,
+  // 'hardware' decodes the stream on the GPU (required for 60 fps);
+  // 'software' is the CPU compatibility path. Applied at app startup.
+  videoDecode: 'hardware',
+  // Game-stream audio boost, percent (100 = untouched native path).
+  gameVolume: 100,
 };
 
-const VALID_BITRATES = new Set([0, 15, 25, 40]);
+const VALID_BITRATES = new Set([0, 8, 15, 25, 40]);
+const VALID_DECODE = new Set(['hardware', 'software']);
+const validVolume = (v) =>
+  Number.isInteger(v) && v >= 100 && v <= 300 && v % 25 === 0;
 
 const VALID_SCALES = new Set(['auto', 1, 1.25, 1.5]);
 // Electron accelerator: modifiers + key code, e.g. "Control+Shift+M".
@@ -54,6 +62,8 @@ function sanitize(raw) {
   if (typeof raw.hudHidesApp === 'boolean') out.hudHidesApp = raw.hudHidesApp;
   if (VALID_BITRATES.has(raw.streamBitrateMbps))
     out.streamBitrateMbps = raw.streamBitrateMbps;
+  if (VALID_DECODE.has(raw.videoDecode)) out.videoDecode = raw.videoDecode;
+  if (validVolume(raw.gameVolume)) out.gameVolume = raw.gameVolume;
   return out;
 }
 

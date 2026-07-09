@@ -18,7 +18,10 @@ const listeners = new Set();
 
 const INJECT = String.raw`(() => {
   if (window.__grMic) return;
-  const state = { tracks: new Set(), muted: __GR_MUTED__, remote: 0, kbps: __GR_KBPS__ };
+  const state = {
+    tracks: new Set(), muted: __GR_MUTED__, remote: 0, kbps: __GR_KBPS__,
+    pads: 0, gainPct: __GR_GAIN__, gainNode: null, gainVideo: null,
+  };
   window.__grMic = {
     setMuted(m) {
       state.muted = !!m;
@@ -30,7 +33,40 @@ const INJECT = String.raw`(() => {
     setKbps(k) { state.kbps = k | 0; },
     // Peak inbound level since last read (decays so the light goes out).
     remoteLevel() { const v = state.remote; state.remote *= 0.5; return v; },
+    pads: () => state.pads,
+    // Game-stream volume boost. 100% leaves the native audio path untouched;
+    // above that, the <video> element is routed through a GainNode.
+    setGain(pct) {
+      state.gainPct = pct | 0;
+      applyGain();
+    },
   };
+  const applyGain = () => {
+    try {
+      const v = document.querySelector('video');
+      if (!v) return;
+      if (state.gainPct === 100 && !state.gainNode) return; // never touched
+      const ctx = window.__grCtx || (window.__grCtx = new AudioContext());
+      if (state.gainVideo !== v) {
+        // New game stream (or first boost): rebuild the graph on this element.
+        const src = ctx.createMediaElementSource(v);
+        state.gainNode = ctx.createGain();
+        src.connect(state.gainNode).connect(ctx.destination);
+        state.gainVideo = v;
+      }
+      state.gainNode.gain.value = state.gainPct / 100;
+      if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+    } catch {}
+  };
+  // Rebind the gain graph when a new game launches (fresh <video> element),
+  // and track controller presence for the shell's indicator.
+  window.addEventListener('gamepadconnected', () => (state.pads += 1));
+  window.addEventListener('gamepaddisconnected', () => {
+    state.pads = Math.max(0, state.pads - 1);
+  });
+  setInterval(() => {
+    if (state.gainPct !== 100) applyGain();
+  }, 2000);
   // Advertise a higher receive-bandwidth cap on video m-sections.
   const setVideoBitrate = (sdp, kbps) => {
     const out = [];
@@ -116,10 +152,9 @@ const bitrateKbps = () => (config.get().streamBitrateMbps | 0) * 1000;
 function inject(contents) {
   return contents
     .executeJavaScript(
-      INJECT.replace('__GR_MUTED__', String(muted)).replace(
-        '__GR_KBPS__',
-        String(bitrateKbps())
-      )
+      INJECT.replace('__GR_MUTED__', String(muted))
+        .replace('__GR_KBPS__', String(bitrateKbps()))
+        .replace('__GR_GAIN__', String(config.get().gameVolume | 0))
     )
     .catch(() => {});
 }
@@ -130,6 +165,17 @@ function applyBitrate() {
     xboxContents
       .executeJavaScript(
         `window.__grMic && window.__grMic.setKbps(${bitrateKbps()})`
+      )
+      .catch(() => {});
+  }
+}
+
+// Called when the volume setting changes; applies to the live stream.
+function applyGain() {
+  if (xboxContents && !xboxContents.isDestroyed()) {
+    xboxContents
+      .executeJavaScript(
+        `window.__grMic && window.__grMic.setGain(${config.get().gameVolume | 0})`
       )
       .catch(() => {});
   }
@@ -167,17 +213,18 @@ async function setMuted(m) {
   return muted;
 }
 
-// Polled by main while the HUD is visible.
+// Polled by main (fast while the HUD is visible; slow for the 🎮 indicator).
 async function getStatus() {
   let remote = 0;
+  let pads = 0;
   if (xboxContents && !xboxContents.isDestroyed()) {
     try {
-      remote = await xboxContents.executeJavaScript(
-        'window.__grMic && window.__grMic.remoteLevel ? window.__grMic.remoteLevel() : 0'
+      [remote, pads] = await xboxContents.executeJavaScript(
+        'window.__grMic ? [window.__grMic.remoteLevel(), window.__grMic.pads()] : [0, 0]'
       );
     } catch {}
   }
-  return { muted, remote: Number(remote) || 0 };
+  return { muted, remote: Number(remote) || 0, pads: Number(pads) || 0 };
 }
 
 const toggle = () => setMuted(!muted);
@@ -192,4 +239,5 @@ module.exports = {
   onChange,
   getStatus,
   applyBitrate,
+  applyGain,
 };

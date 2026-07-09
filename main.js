@@ -15,14 +15,20 @@ const REPO_URL = pkg.homepage;
 // One combined list — appendSwitch replaces (not merges) repeated keys.
 // - GlobalShortcutsPortal: Wayland global hotkeys via the desktop portal
 //   (KDE; GNOME 48+).
-// - AcceleratedVideoDecodeLinuxGL: hardware (VA-API) video decode, which
-//   Linux Chromium leaves OFF by default. Without it the CPU software-decodes
-//   the cloud-gaming stream (~13ms/frame at 1440p); the stall reads as
-//   latency to xCloud, which slashes the bitrate — worst in fullscreen.
-app.commandLine.appendSwitch(
-  'enable-features',
-  'GlobalShortcutsPortal,AcceleratedVideoDecodeLinuxGL'
-);
+// - Hardware (VA-API) video decode, which Linux Chromium leaves OFF by
+//   default: without it the CPU software-decodes the cloud-gaming stream
+//   (~13ms/frame at 1440p) and can never sustain 60 fps. GPU decode is the
+//   default; Settings offers the CPU path for buggy-driver setups.
+//   VaapiIgnoreDriverChecks lets the NVIDIA VA-API shim through Chromium's
+//   allowlist (still needs the system package, e.g. libva-nvidia-driver).
+const enableFeatures = ['GlobalShortcutsPortal'];
+if (config.get().videoDecode !== 'software') {
+  enableFeatures.push(
+    'AcceleratedVideoDecodeLinuxGL',
+    'VaapiIgnoreDriverChecks'
+  );
+}
+app.commandLine.appendSwitch('enable-features', enableFeatures.join(','));
 
 // Chromium's Vulkan path is incompatible with native Wayland and aborts the
 // whole process under heavy GPU load (cloud-gaming video decode). Chromium
@@ -103,6 +109,7 @@ function registerIpc() {
     tray.refresh(next);
     windows.applyScale(next, xboxContents);
     ptt.applyBitrate();
+    ptt.applyGain();
     return next;
   });
   ipcMain.handle('settings:testAccelerator', (e, accel) =>
@@ -134,6 +141,19 @@ function startHudFeed() {
     const status = await ptt.getStatus();
     windows.getHud()?.webContents.send('hud:status', status);
   }, 300);
+  // Slow always-on poll: controller indicator for the titlebar. (Chromium
+  // only exposes gamepads to the page after a button press — the indicator
+  // lighting up tells the user the controller IS seen by the app, even
+  // while Xbox's home UI ignores it until a game starts.)
+  let lastPads = -1;
+  setInterval(async () => {
+    const { pads } = await ptt.getStatus();
+    if (pads === lastPads) return;
+    lastPads = pads;
+    for (const win of BrowserWindow.getAllWindows()) {
+      win.webContents.send('gamepad:state', pads);
+    }
+  }, 3000);
 }
 
 // --- Per-webContents hardening + feature wiring -----------------------------
