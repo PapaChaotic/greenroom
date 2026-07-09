@@ -24,7 +24,9 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
+      # --ignore-scripts: this workflow runs on pull_request, so it must not
+      # execute lifecycle scripts from a PR's (untrusted) dependency tree.
+      - run: npm ci --ignore-scripts
       - name: npm audit (fail on high+)
         run: npm audit --audit-level=high
       - name: Check Electron staleness

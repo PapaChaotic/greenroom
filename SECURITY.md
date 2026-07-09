@@ -22,8 +22,11 @@ All boundaries live in [`src/security.js`](src/security.js) for single-point aud
 | Shell windows | Load only local files; **all** navigation blocked; CSP `default-src 'self'` |
 | Renderer isolation | `contextIsolation: true`, `nodeIntegration: false`, `sandbox: true` on every window |
 | Webview attach | `will-attach-webview` strips any preload and forces isolation — no privileged webview can ever attach |
-| IPC | Fixed channel allowlist in the preload; main process validates every sender before acting |
+| IPC | Fixed channel allowlist in the preload; main process validates every sender before acting. The Xbox page cannot reach IPC (no preload, and webview guests fail sender validation) |
 | Popups | `setWindowOpenHandler` denies all popup windows |
+| Page hooks | The mic/party-audio code injected into the Xbox page ([`src/ptt.js`](src/ptt.js)) interpolates only booleans/constants — no user or remote data flows into `executeJavaScript` |
+| Mute integrity | Mute state is re-asserted into the page every 10s, so page scripts can't silently re-enable the mic while the UI shows muted |
+| CLI signals | `--hud` / `--mic` signal the running instance via Electron's single-instance lock, scoped to this user's profile — other local users can't send them |
 
 ## Packaged-binary hardening (enforced at build time)
 
@@ -40,7 +43,7 @@ these cannot be re-enabled at runtime:
 
 | Process | Where | What it does |
 |---|---|---|
-| Dependency audit | [`security-audit.yml`](.github/workflows/security-audit.yml) | `npm audit --audit-level=high` on every push/PR **and weekly** (catches new CVEs against unchanged deps) |
+| Dependency audit | [`security-audit.yml`](.github/workflows/security-audit.yml) | `npm audit --audit-level=high` on every push/PR **and weekly** (catches new CVEs against unchanged deps). Runs `--ignore-scripts` so untrusted PR dependency trees can't execute code in CI |
 | Electron staleness | same workflow | Opens an issue automatically when our Electron major falls behind latest (Chromium security fixes ship in majors) |
 | Electron canary | [`electron-canary.yml`](.github/workflows/electron-canary.yml) | Weekly build against `electron@latest`; **auto-opens an issue if the new Electron breaks the app**, so upgrades are never blind |
 | Release gate | [`release.yml`](.github/workflows/release.yml) | A release build **fails** if the audit or smoke test fails — vulnerable builds can't ship |

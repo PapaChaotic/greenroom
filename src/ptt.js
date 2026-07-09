@@ -83,6 +83,17 @@ function attach(contents) {
   if (!contents.isLoading()) inject(contents);
 }
 
+// Integrity: mute state lives in the page's world, where page scripts could
+// theoretically re-enable tracks behind our back. While muted, re-assert
+// silence every 10s so the tray icon can never lie about the mic.
+setInterval(() => {
+  if (muted && xboxContents && !xboxContents.isDestroyed()) {
+    xboxContents
+      .executeJavaScript('window.__grMic && window.__grMic.setMuted(true)')
+      .catch(() => {});
+  }
+}, 10_000);
+
 async function setMuted(m) {
   muted = !!m;
   if (xboxContents && !xboxContents.isDestroyed()) {

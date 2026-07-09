@@ -21,7 +21,7 @@ function logFile() {
 function record(entry) {
   const line = JSON.stringify({ time: new Date().toISOString(), ...entry });
   try {
-    fs.appendFileSync(logFile(), line + '\n');
+    fs.appendFileSync(logFile(), line + '\n', { mode: 0o600 });
   } catch {
     /* logging must never crash the crash handler */
   }
