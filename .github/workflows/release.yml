@@ -17,6 +17,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Install rpm tooling (Ubuntu runners can't build .rpm without it)
+        run: sudo apt-get update -q && sudo apt-get install -yq rpm
       - name: Security gate — fail the release on known vulnerabilities
         run: npm audit --audit-level=high
       - name: Allow Electron sandbox (Ubuntu 24.04 restricts unprivileged userns)
