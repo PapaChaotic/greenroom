@@ -1,14 +1,42 @@
 name: Build & publish beta release
 
+# Releases are cut by landing a version bump on main — NOT by pushing tags.
+# Why: the in-app updater discovers versions from GitHub's releases feed,
+# which includes bare tags. A pushed tag is visible minutes before its build
+# finishes, so update checks in that window fail. Here the flow is atomic:
+# build into a tagless DRAFT, then publish — GitHub creates the tag at the
+# same instant the assets become downloadable.
 on:
   push:
-    tags: ['v*']
+    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      release: ${{ steps.ver.outputs.release }}
+      version: ${{ steps.ver.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: ver
+        name: Release only if this version has no tag yet
+        run: |
+          V=$(node -p "require('./package.json').version")
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+          if git ls-remote --exit-code --tags origin "refs/tags/v$V" >/dev/null 2>&1; then
+            echo "v$V already released — skipping"
+            echo "release=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "release=true" >> "$GITHUB_OUTPUT"
+          fi
+
   build:
+    needs: gate
+    if: needs.gate.outputs.release == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,17 +53,15 @@ jobs:
         run: sudo sysctl -q -w kernel.apparmor_restrict_unprivileged_userns=0
       - name: Smoke test
         run: xvfb-run --auto-servernum npm run smoke
-      - name: Build AppImage, deb, rpm and upload to a DRAFT release
+      - name: Build AppImage, deb, rpm and upload to a DRAFT release (no tag yet)
         run: npx electron-builder --linux --publish always
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # Publish only after every asset (including latest-linux.yml) is up, so
-      # in-app update checks never catch a half-uploaded release.
-      - name: Flip the draft live as a prerelease
+      - name: Publish atomically — tag and assets go live together
         uses: actions/github-script@v7
         with:
           script: |
-            const tag = context.ref.replace('refs/tags/', '');
+            const tag = 'v${{ needs.gate.outputs.version }}';
             const { data: releases } = await github.rest.repos.listReleases({
               owner: context.repo.owner, repo: context.repo.repo,
             });

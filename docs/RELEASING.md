@@ -24,26 +24,34 @@
 # bump the beta number (0.9.0-beta.1 -> 0.9.0-beta.2)
 npm version prerelease --preid=beta
 
-git push && git push --tags
+git push origin main    # just main — do NOT push the tag
 ```
 
-Pushing the `v*` tag triggers `.github/workflows/release.yml`, which:
+**Never `git push --tags`.** The in-app updater sees new tags immediately,
+minutes before a build finishes, and update checks in that window fail.
+Instead, CI notices the version bump on main and releases **atomically**:
 
-1. runs the **security gate** (`npm audit`, fails on high+),
-2. runs the **smoke test** under Xvfb,
-3. builds **AppImage + deb + rpm** with the security fuses flipped,
-4. publishes everything as a GitHub **Pre-release** (beta channel).
+1. **gate** — skips entirely unless `package.json`'s version has no tag yet,
+2. security gate (`npm audit`, fails on high+) and smoke test under Xvfb,
+3. builds **AppImage + deb + rpm** with the security fuses flipped into a
+   tagless **draft** release,
+4. publishes the draft — GitHub creates the `vX.Y.Z` tag at the same instant
+   the assets become downloadable. There is no moment where an update check
+   can see a version it can't download.
 
-Users on the AppImage get the update dialog within ~6 hours (or via
-Settings → "Check for updates now"). deb/rpm users get a dialog linking to the
-release page.
+(`npm version` still creates a local tag; it matches the one CI creates, so
+leave it be. The workflow can also be run manually from the Actions tab.)
+
+Users on the AppImage get a passive update notice within ~6 hours (tray menu
+item — nothing interrupts them; see src/updater.js). deb/rpm users get
+pointed at the release page when they choose to update.
 
 ## Promoting beta → stable
 
-When ready for 1.0: `npm version 1.0.0`, push the tag, and after CI publishes,
-edit the GitHub release and untick "pre-release". From then on you may also
-want to flip `autoUpdater.allowPrerelease` to `false` in `src/updater.js` so
-stable users don't get offered future betas.
+When ready for 1.0: `npm version 1.0.0`, `git push origin main`, and after CI
+publishes, edit the GitHub release and untick "pre-release". From then on you
+may also want to flip `autoUpdater.allowPrerelease` to `false` in
+`src/updater.js` so stable users don't get offered future betas.
 
 ## If the Electron canary opens an issue
 
