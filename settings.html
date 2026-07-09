@@ -28,12 +28,13 @@
     <select id="stream-bitrate">
       <option value="0">Xbox default (conservative — can look blurry)</option>
       <option value="15">Up to 15 Mbps</option>
-      <option value="25">Up to 25 Mbps (recommended)</option>
-      <option value="40">Up to 40 Mbps (sharpest, needs fast internet)</option>
+      <option value="25">Up to 25 Mbps (recommended — Xbox's real max)</option>
+      <option value="40">Up to 40 Mbps (headroom; Xbox tops out ~25 today)</option>
     </select>
     <p class="hint">
       Raises the bitrate ceiling Xbox is allowed to use — the stream still
-      adapts down on a weak connection. Applies to the next game you launch.
+      adapts down on a weak connection. Xbox's own servers currently top out
+      around 25 Mbps. Applies to the next game you launch.
     </p>
   </div>
 
