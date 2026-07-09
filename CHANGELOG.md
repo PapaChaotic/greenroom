@@ -1,5 +1,36 @@
 # Changelog
 
+## 0.9.0 (2026-07-09)
+
+First release. GreenRoom is an **unofficial Xbox party chat client for
+Linux and Steam Deck** — Microsoft's official web party chat
+(xbox.com/play) wrapped in a hardened, Game Bar-style desktop shell.
+Not affiliated with or endorsed by Microsoft.
+
+### Highlights
+- 🎙 **Party voice chat** with persistent Microsoft sign-in
+- 🪟 **Game Bar HUD** (`Ctrl+Shift+G`) — a translucent, draggable pill with
+  mic toggle, party-audio activity light, and a 📌 pin; Esc or click-away
+  dismisses it while your party keeps running
+- ⌨️ **Customizable hotkeys**, with a universal fallback (`greenroom --hud`
+  / `--mic`) for Wayland desktops and Steam Input bindings
+- 🔕 **System tray** — close to tray, mute from the tray
+- 🖥 **Steam Deck**: auto 125% scaling, Game Mode friendly
+- 🔄 **Interruption-free updates**: background-found updates wait quietly in
+  the tray; nothing downloads, installs, or restarts without your consent
+- 🔒 **Security-first**: mic scoped to xbox.com only, navigation allowlisted,
+  sandboxed renderers, hardened binaries (Electron fuses), zero telemetry,
+  consent-based crash reporting
+
+### Known limitations
+- Voice chat only — cloud gaming video (Widevine DRM) is out of scope
+- Web party chat may require Xbox Insider enrollment on some accounts
+- Native-Wayland global hotkeys need the GlobalShortcuts portal (KDE,
+  GNOME 48+) — the `--hud`/`--mic` fallback works everywhere
+- Not yet tested on physical Steam Deck hardware — reports welcome!
+
+*(Development history below: beta.1 through beta.7.)*
+
 ## 0.9.0-beta.7 (2026-07-09)
 
 ### Changed
