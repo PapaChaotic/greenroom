@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.9.0-beta.7 (2026-07-09)
+
+### Changed
+- **Background updates can no longer interrupt you — ever.** An update found
+  by the automatic 6-hour check no longer opens a dialog. Instead it waits
+  quietly: a "⬆ Update to X — install…" item appears in the tray menu and a
+  brief notice shows in the app. Dialogs (and the download/restart flow) only
+  ever run when you explicitly choose to update. Nothing downloads, installs,
+  or restarts on its own.
+
 ## 0.9.0-beta.6 (2026-07-09)
 
 ### Fixed

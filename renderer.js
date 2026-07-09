@@ -49,6 +49,15 @@ window.greenroom.onHotkeyStatus(({ failed }) => {
   setTimeout(() => note.classList.add('hidden'), 10_000);
 });
 
+// --- Passive update notice (never a dialog — see src/updater.js) ---
+window.greenroom.onUpdateAvailable((version) => {
+  note.textContent =
+    `GreenRoom ${version} is ready — install anytime from the tray menu ` +
+    'or Settings. No rush, your party stays connected.';
+  note.classList.remove('hidden');
+  setTimeout(() => note.classList.add('hidden'), 12_000);
+});
+
 // --- Loading overlay ---
 view.addEventListener('did-start-loading', () => {
   loading.classList.remove('hidden');

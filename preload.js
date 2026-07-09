@@ -19,6 +19,8 @@ contextBridge.exposeInMainWorld('greenroom', {
   hudOpenApp: () => ipcRenderer.send('hud:open'),
   onHudStatus: (cb) => ipcRenderer.on('hud:status', (_e, v) => cb(v)),
   onHotkeyStatus: (cb) => ipcRenderer.on('hotkeys:status', (_e, v) => cb(v)),
+  onUpdateAvailable: (cb) =>
+    ipcRenderer.on('update:available', (_e, v) => cb(v)),
 
   // settings
   openSettings: () => ipcRenderer.send('settings:open'),

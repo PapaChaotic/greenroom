@@ -12,6 +12,13 @@ let getWindow = () => null;
 let repoUrl = null;
 let checking = false;
 
+// Background-discovered updates NEVER open a dialog — gaming and party chat
+// must not be interrupted. They're parked here and surfaced passively (tray
+// item + in-app notice); the dialog flow only runs when the user asks.
+let pendingUpdate = null;
+let interactive = false;
+let onPendingUpdate = () => {};
+
 // Transient failures (release mid-upload, flaky network, GitHub hiccup)
 // self-heal: retry a few times, spaced out, then give up until the next
 // scheduled check.
@@ -93,6 +100,7 @@ async function check({ manual = false } = {}) {
     return;
   }
   checking = true;
+  interactive = manual;
   try {
     const result = await autoUpdater.checkForUpdates();
     retries = 0; // healthy again — future failures get a fresh retry budget
@@ -126,21 +134,38 @@ async function check({ manual = false } = {}) {
     }
   } finally {
     checking = false;
+    interactive = false;
   }
 }
 
-function init({ windowGetter, config, repositoryUrl }) {
+// Called from the tray's "Update to X available…" item (or anywhere else the
+// user explicitly opts in) — runs the consent dialog for a parked update.
+function promptPending() {
+  if (pendingUpdate) promptAndApply(pendingUpdate);
+}
+
+function init({ windowGetter, config, repositoryUrl, onUpdateAvailable }) {
   getWindow = windowGetter;
   repoUrl = repositoryUrl;
+  if (onUpdateAvailable) onPendingUpdate = onUpdateAvailable;
 
-  if (!app.isPackaged) return { check };
+  if (!app.isPackaged) return { check, promptPending };
 
   ({ autoUpdater } = require('electron-updater'));
   autoUpdater.autoDownload = false;
   autoUpdater.autoInstallOnAppQuit = false;
   autoUpdater.allowPrerelease = true; // beta channel
 
-  autoUpdater.on('update-available', (info) => promptAndApply(info));
+  autoUpdater.on('update-available', (info) => {
+    pendingUpdate = info;
+    if (interactive) {
+      // The user asked — talk to them.
+      promptAndApply(info);
+    } else {
+      // Background find: no dialogs, no focus steal. Surface passively.
+      onPendingUpdate(info);
+    }
+  });
   autoUpdater.on('update-downloaded', async () => {
     const { response } = await dialog.showMessageBox(getWindow(), {
       type: 'info',
@@ -162,7 +187,7 @@ function init({ windowGetter, config, repositoryUrl }) {
     setTimeout(() => check(), 15_000);
     setInterval(() => check(), 6 * 60 * 60 * 1000);
   }
-  return { check };
+  return { check, promptPending };
 }
 
 module.exports = { init };

@@ -159,6 +159,7 @@ app.whenReady().then(() => {
     toggleGameBar: () => actions.gameBar(),
     openSettings: () => windows.openSettings(),
     checkUpdates: () => updaterApi.check({ manual: true }),
+    applyUpdate: () => updaterApi.promptPending(),
     quit: () => {
       quitting = true;
       app.quit();
@@ -173,6 +174,11 @@ app.whenReady().then(() => {
     windowGetter: () => windows.getMain(),
     config: config.get(),
     repositoryUrl: REPO_URL,
+    // Background-found updates surface passively: tray item + in-app notice.
+    onUpdateAvailable: (info) => {
+      tray.setUpdateAvailable(info.version, config.get());
+      windows.getMain()?.webContents.send('update:available', info.version);
+    },
   });
 
   // CI smoke test: prove the app boots and the shell renders, then exit.

@@ -4,6 +4,7 @@ const path = require('path');
 let tray = null;
 let actions = null;
 let micMuted = false;
+let pendingVersion = null;
 
 const icon = (name) =>
   nativeImage.createFromPath(path.join(__dirname, '..', 'assets', name));
@@ -12,6 +13,16 @@ function rebuildMenu(config) {
   const hk = config.hotkeys;
   tray.setContextMenu(
     Menu.buildFromTemplate([
+      // A background-discovered update waits here until the user is ready.
+      ...(pendingVersion
+        ? [
+            {
+              label: `⬆ Update to ${pendingVersion} — install…`,
+              click: actions.applyUpdate,
+            },
+            { type: 'separator' },
+          ]
+        : []),
       { label: 'Show GreenRoom', click: actions.show },
       {
         label: micMuted ? 'Unmute mic' : 'Mute mic',
@@ -31,7 +42,8 @@ function rebuildMenu(config) {
     ])
   );
   tray.setToolTip(
-    micMuted ? 'GreenRoom — mic muted' : 'GreenRoom — mic live'
+    (micMuted ? 'GreenRoom — mic muted' : 'GreenRoom — mic live') +
+      (pendingVersion ? ` · update ${pendingVersion} ready` : '')
   );
 }
 
@@ -52,4 +64,9 @@ function setMicState(m, config) {
 
 const refresh = (config) => tray && rebuildMenu(config);
 
-module.exports = { create, setMicState, refresh };
+function setUpdateAvailable(version, config) {
+  pendingVersion = version;
+  if (tray) rebuildMenu(config);
+}
+
+module.exports = { create, setMicState, refresh, setUpdateAvailable };
