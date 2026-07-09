@@ -12,8 +12,6 @@ const path = require('path');
 let repoUrl = null;
 let reporting = false; // don't stack dialogs if crashes cascade
 
-const IGNORED_REASONS = new Set(['clean-exit', 'killed']);
-
 function logFile() {
   return path.join(app.getPath('userData'), 'crash.log');
 }
@@ -80,28 +78,59 @@ async function offerReport(entry) {
   }
 }
 
+// A main-process abort (GPU-stack crash, SIGKILL, OOM) takes our handlers
+// down with it and leaves no trace. Detect it after the fact: a sentinel file
+// exists while the app runs and is removed on clean shutdown — finding it at
+// startup means the previous session died hard.
+function initSentinel() {
+  const sentinel = path.join(app.getPath('userData'), '.session-active');
+  let crashed = false;
+  try {
+    crashed = fs.existsSync(sentinel);
+    fs.writeFileSync(sentinel, String(process.pid), { mode: 0o600 });
+  } catch {
+    return;
+  }
+  app.on('will-quit', () => {
+    try {
+      fs.unlinkSync(sentinel);
+    } catch {}
+  });
+  if (crashed) {
+    const entry = {
+      kind: 'previous-session',
+      reason: 'terminated without a clean shutdown (hard crash or kill)',
+    };
+    record(entry);
+    // Let the window come up first; this is a consent dialog, not a nag.
+    setTimeout(() => offerReport(entry), 4000);
+  }
+}
+
 function init(repositoryUrl) {
   repoUrl = repositoryUrl;
 
   // Local minidumps only — uploadToServer stays false, always.
   crashReporter.start({ uploadToServer: false });
+  initSentinel();
 
   app.on('render-process-gone', (_e, _wc, details) => {
-    if (IGNORED_REASONS.has(details.reason)) return;
+    // 'killed' is how OOM and compositor kills report — never ignore it.
+    if (details.reason === 'clean-exit') return;
     const entry = { kind: 'renderer', reason: details.reason, exitCode: details.exitCode };
     record(entry);
     offerReport(entry);
   });
 
   app.on('child-process-gone', (_e, details) => {
-    if (IGNORED_REASONS.has(details.reason)) return;
+    if (details.reason === 'clean-exit') return;
     const entry = {
       kind: details.type, // 'GPU', 'Utility', ...
       reason: details.reason,
       exitCode: details.exitCode,
     };
-    record(entry);
-    // GPU process restarts are usually transparent; only nag on repeat.
+    record(entry); // GPU deaths are always logged now, even 'killed' ones
+    // GPU process restarts are usually transparent; don't dialog for them.
     if (details.type !== 'GPU') offerReport(entry);
   });
 

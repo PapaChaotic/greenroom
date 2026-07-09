@@ -16,6 +16,11 @@ const REPO_URL = pkg.homepage;
 // portal (KDE ships it; GNOME 48+). This makes Chromium use it when present.
 app.commandLine.appendSwitch('enable-features', 'GlobalShortcutsPortal');
 
+// Chromium's Vulkan path is incompatible with native Wayland and aborts the
+// whole process under heavy GPU load (cloud-gaming video decode). Chromium
+// logs this exact advice at startup; take it. GL/ANGLE handles rendering.
+app.commandLine.appendSwitch('disable-features', 'Vulkan');
+
 // Tray apps must be single-instance: a second launch signals the first.
 // That also gives us a hotkey fallback that works on EVERY desktop: bind a
 // system shortcut to `greenroom --hud` (or --mic) and it controls the
@@ -137,21 +142,23 @@ app.on('web-contents-created', (_event, contents) => {
   hotkeys.attachFallback(contents, config.get, actions);
 });
 
+// Close-to-tray: the party keeps running in the background.
+const mainWindowOpts = {
+  onClose: (event, win) => {
+    if (!quitting && config.get().closeToTray) {
+      event.preventDefault();
+      win.hide();
+    }
+  },
+};
+
 // --- Lifecycle ---------------------------------------------------------------
 app.whenReady().then(() => {
   crash.init(REPO_URL);
   security.configureSession();
   registerIpc();
 
-  windows.createMain(config.get(), {
-    onClose: (event, win) => {
-      // Close-to-tray: the party keeps running in the background.
-      if (!quitting && config.get().closeToTray) {
-        event.preventDefault();
-        win.hide();
-      }
-    },
-  });
+  windows.createMain(config.get(), mainWindowOpts);
 
   tray.create(config.get(), {
     show: () => windows.show(),
@@ -207,7 +214,14 @@ app.whenReady().then(() => {
 app.on('before-quit', () => (quitting = true));
 
 app.on('window-all-closed', () => {
-  // With close-to-tray the main window hides instead of closing, so reaching
-  // this means the user actually quit (or disabled closeToTray).
-  if (process.platform !== 'darwin') app.quit();
+  if (process.platform === 'darwin') return;
+  // With close-to-tray on, a user-initiated close only HIDES the window — so
+  // reaching this state means the window was DESTROYED out from under us
+  // (e.g. a compositor kill during heavy GPU load). Resurrect instead of
+  // dying: the app stays in the tray and reloads Xbox.
+  if (!quitting && config.get().closeToTray) {
+    windows.createMain(config.get(), mainWindowOpts);
+  } else {
+    app.quit();
+  }
 });

@@ -87,8 +87,8 @@ GreenRoom.AppImage --mic   # toggle your microphone
   Insider program; if the party UI doesn't appear for your account, enroll at
   [xbox.com insider program](https://www.xbox.com/en-US/xbox-insider-program).
 - **Cloud gaming plays** because Xbox streams gameplay over WebRTC (no DRM
-  plugin required). Note the app is chat-first: streaming performance
-  tuning (codec/VRR/latency work) isn't a current focus.
+  plugin required). The app is chat-first: streaming works but hasn't had
+  performance tuning, and long sessions are less battle-tested than voice.
 - Mic capture uses your system's PipeWire/PulseAudio; if the mic works in
   Chromium, it works here.
 - **Beta**: expect rough edges — crashes offer a pre-filled GitHub issue

@@ -3,6 +3,17 @@
 ## Unreleased
 
 ### Fixed
+- **Crash during cloud gaming on Wayland.** Chromium's Vulkan path aborts
+  the entire app under streaming video-decode load on native Wayland;
+  Vulkan is now disabled (Chromium's own recommendation) in favor of the
+  stable GL path.
+- **Crash visibility.** Hard crashes (GPU-stack aborts, OOM/compositor
+  kills) previously left no trace and no report offer. Now: a session
+  sentinel detects unclean shutdowns on next launch and offers a crash
+  report; `killed` process deaths are logged instead of ignored.
+- **Crash resilience.** If the window is destroyed out from under the app
+  (compositor kill), GreenRoom resurrects it from the tray instead of
+  silently quitting.
 - The HUD party-audio light now ignores cloud-gaming streams (connections
   carrying video) — it responds to party voices, not game sound.
 
