@@ -12,9 +12,17 @@ const crash = require('./src/crash');
 const pkg = require('./package.json');
 const REPO_URL = pkg.homepage;
 
-// On Wayland, global hotkeys must go through the desktop's GlobalShortcuts
-// portal (KDE ships it; GNOME 48+). This makes Chromium use it when present.
-app.commandLine.appendSwitch('enable-features', 'GlobalShortcutsPortal');
+// One combined list — appendSwitch replaces (not merges) repeated keys.
+// - GlobalShortcutsPortal: Wayland global hotkeys via the desktop portal
+//   (KDE; GNOME 48+).
+// - AcceleratedVideoDecodeLinuxGL: hardware (VA-API) video decode, which
+//   Linux Chromium leaves OFF by default. Without it the CPU software-decodes
+//   the cloud-gaming stream (~13ms/frame at 1440p); the stall reads as
+//   latency to xCloud, which slashes the bitrate — worst in fullscreen.
+app.commandLine.appendSwitch(
+  'enable-features',
+  'GlobalShortcutsPortal,AcceleratedVideoDecodeLinuxGL'
+);
 
 // Chromium's Vulkan path is incompatible with native Wayland and aborts the
 // whole process under heavy GPU load (cloud-gaming video decode). Chromium

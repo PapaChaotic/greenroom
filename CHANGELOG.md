@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.9.3 (2026-07-09)
+
+### Fixed
+- **Cloud gaming bitrate collapse in fullscreen.** Linux Chromium ships with
+  hardware video decode disabled, so the CPU software-decoded the stream;
+  under fullscreen presentation the decode pipeline stalled, xCloud's
+  app-level latency stat spiked, and the server slashed the bitrate thinking
+  the network was congested. Hardware (VA-API) decode is now enabled —
+  decode drops to GPU speeds and the stream should hold its bitrate in both
+  windowed and fullscreen.
+
 ## 0.9.2 (2026-07-09)
 
 ### Added
