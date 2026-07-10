@@ -1,7 +1,7 @@
 {
   "name": "greenroom",
   "productName": "GreenRoom",
-  "version": "0.10.6",
+  "version": "0.10.7",
   "description": "Unofficial Xbox party chat and Game Pass cloud gaming client for Linux and Steam Deck. Not affiliated with or endorsed by Microsoft.",
   "main": "main.js",
   "author": {
