@@ -144,6 +144,42 @@ const INJECT = String.raw`(() => {
       } catch {}
       return origSLD.call(this, desc, ...rest);
     };
+
+    // Prefer better H.264 profiles: High (64) > Main (4d) > Baseline (42).
+    // Xbox hands unknown browsers Constrained Baseline — worst quality per
+    // bit, and the one profile hardware decoders commonly don't advertise,
+    // which forces WebRTC onto FFmpeg software decode. If the server only
+    // offers Baseline, the answer is unchanged (zero regression).
+    const profileRank = (c) => {
+      if (!/video\/h264/i.test(c.mimeType)) return 1;
+      const m = /profile-level-id=([0-9a-fA-F]{2})/.exec(c.sdpFmtpLine || '');
+      const prof = m ? m[1].toLowerCase() : '';
+      if (prof === '64') return -2; // High
+      if (prof === '4d') return -1; // Main
+      return 2; // Baseline & friends last
+    };
+    const origCreateAnswer = RTC.prototype.createAnswer;
+    RTC.prototype.createAnswer = function (...a) {
+      try {
+        const caps = RTCRtpReceiver.getCapabilities('video');
+        if (caps && caps.codecs && caps.codecs.length) {
+          const sorted = [...caps.codecs].sort(
+            (x, y) => profileRank(x) - profileRank(y)
+          );
+          for (const t of this.getTransceivers()) {
+            const kind =
+              (t.receiver && t.receiver.track && t.receiver.track.kind) ||
+              null;
+            if (kind === 'video' && t.setCodecPreferences) {
+              try {
+                t.setCodecPreferences(sorted);
+              } catch {}
+            }
+          }
+        }
+      } catch {}
+      return origCreateAnswer.apply(this, a);
+    };
   }
 })();`;
 

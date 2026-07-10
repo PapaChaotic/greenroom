@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.10.6 (2026-07-09)
+
+### Changed
+- **Better H.264 profile negotiation.** Xbox serves unknown browsers
+  Constrained Baseline — the lowest-quality H.264 profile per bit, and the
+  one hardware decoders typically don't support, which forces WebRTC onto
+  software decoding (confirmed via webrtc-internals: decoder=FFmpeg,
+  profile 42001f). GreenRoom now prefers High > Main > Baseline in the
+  codec negotiation. If the server only offers Baseline, nothing changes.
+
 ## 0.10.4 (2026-07-09)
 
 ### Added
