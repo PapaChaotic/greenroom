@@ -5,11 +5,15 @@ const { session, shell } = require('electron');
 // The Xbox web surface that hosts party chat + social features.
 const XBOX_URL = 'https://www.xbox.com/play';
 
-// Present as stock Chrome so xbox.com doesn't flag an "unsupported browser".
+// Present as Edge on Windows — the top-tier web client for xCloud. Xbox's
+// servers pick stream quality per device profile: "Chrome on Linux" gets
+// H.264 Constrained Baseline and conservative caps, while Edge/Windows is
+// offered better codec profiles (and often 60 fps streams). Verified via
+// webrtc-internals: the Linux-Chrome offer contained only profile 42001f.
 // Kept in one place; bump alongside Electron upgrades.
 const CHROME_UA =
-  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) ' +
-  'Chrome/142.0.0.0 Safari/537.36';
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
+  '(KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0';
 
 // Persistent partition => you sign in once and stay signed in across launches.
 const PARTITION = 'persist:xbox';

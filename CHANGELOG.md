@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.10.7 (2026-07-09)
+
+### Changed
+- **Present as Edge on Windows.** Xbox picks stream quality server-side by
+  device profile, and "Chrome on Linux" is bottom tier — its WebRTC offer
+  contains only H.264 Constrained Baseline (verified), no matter what the
+  client requests. Edge/Windows is the top web tier: better codec profiles
+  and, for many titles, 60 fps streams. Combined with 0.10.6's High>Main>
+  Baseline preference, the negotiation can now actually land on a profile
+  hardware decoders support.
+
 ## 0.10.6 (2026-07-09)
 
 ### Changed
