@@ -69,7 +69,15 @@ bootLog(
     `smoke=${process.env.GR_SMOKE || 'unset'} appimage=${!!process.env.APPIMAGE}`
 );
 
+// Launches that only signal the running instance (--hud/--mic/--diag) must
+// not respawn: they exit immediately, and the respawn was dropping their
+// argv so the signal never arrived.
+const isSignalOnly = ['--hud', '--mic', '--diag'].some((f) =>
+  process.argv.includes(f)
+);
+
 if (
+  !isSignalOnly &&
   config.get().videoDecode !== 'software' &&
   fs.existsSync('/proc/driver/nvidia/version') &&
   !process.env.LIBVA_DRIVER_NAME &&
@@ -79,9 +87,10 @@ if (
   bootLog('respawning with LIBVA_DRIVER_NAME=nvidia');
   const { spawn } = require('child_process');
   // Relaunch the AppImage itself when packaged (the /tmp mount dies with
-  // this process); the electron binary + args in dev.
+  // this process); the electron binary + args in dev. Args are preserved
+  // in both cases.
   const exe = process.env.APPIMAGE || process.execPath;
-  const args = process.env.APPIMAGE ? [] : process.argv.slice(1);
+  const args = process.argv.slice(1);
   spawn(exe, args, {
     detached: true,
     stdio: 'ignore',
@@ -323,6 +332,9 @@ app.whenReady().then(() => {
       app.exit(0);
     });
   }
+
+  // --diag on a cold start (no instance already running).
+  if (process.argv.includes('--diag')) openDiagWindows();
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
