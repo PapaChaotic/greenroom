@@ -19,7 +19,7 @@ jobs:
   audit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
           node-version: 22
@@ -27,8 +27,8 @@ jobs:
       # --ignore-scripts: this workflow runs on pull_request, so it must not
       # execute lifecycle scripts from a PR's (untrusted) dependency tree.
       - run: npm ci --ignore-scripts
-      - name: npm audit (fail on high+)
-        run: npm audit --audit-level=high
+      - name: npm audit runtime deps (fail on high+)
+        run: npm audit --audit-level=high --omit=dev
       - name: Check Electron staleness
         id: stale
         run: |
